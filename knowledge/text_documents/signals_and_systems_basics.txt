@@ -1,0 +1,275 @@
+=====================================================================
+FILE: signals_and_systems_basics.txt
+TOPIC: Foundations of Signals and Systems
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: CONTINUOUS-TIME (CT) VS DISCRETE-TIME (DT) SIGNALS
+-----------------------------------------------
+
+DEFINITION (Continuous-Time Signal):
+A continuous-time signal x(t) is defined for every real value of the
+independent variable t, where t is a continuous variable (t belongs to
+the set of real numbers, t in (-infinity, infinity)). The signal can,
+in principle, take on a value at any instant in time. Notation uses
+parentheses: x(t).
+
+DEFINITION (Discrete-Time Signal):
+A discrete-time signal x[n] is defined only at discrete, integer values
+of the independent variable n (n belongs to the set of integers,
+n = ..., -2, -1, 0, 1, 2, ...). It is fundamentally a sequence of
+numbers. Notation uses square brackets: x[n]. This distinguishes it
+visually and conceptually from a CT signal, even when x[n] is derived
+by sampling a CT signal, e.g. x[n] = x(nT) for sampling period T.
+
+KEY NOTATIONAL DIFFERENCE:
+  CT: x(t), t real-valued, parentheses "( )"
+  DT: x[n], n integer-valued, brackets "[ ]"
+A common student error is writing x(n) or x[t]; this is improper since
+it mixes the variable domain with the wrong bracket convention.
+
+-----------------------------------------------
+SECTION 2: PERIODIC VS APERIODIC SIGNALS
+-----------------------------------------------
+
+DEFINITION (CT Periodicity):
+A CT signal x(t) is periodic if there exists a positive real value T > 0
+such that:
+        x(t + T) = x(t)      for all t
+
+The smallest such positive value of T is called the FUNDAMENTAL PERIOD,
+denoted T (or T_0). If x(t) is periodic with fundamental frequency
+omega_0 (in radians/second), the fundamental period is given by:
+
+        T = 2*pi / omega_0
+
+A signal that does NOT satisfy x(t+T) = x(t) for any T > 0 is called
+APERIODIC (or nonperiodic).
+
+DEFINITION (DT Periodicity):
+A DT signal x[n] is periodic if there exists a positive integer N > 0
+such that:
+        x[n + N] = x[n]      for all integers n
+
+The smallest such positive integer N is the FUNDAMENTAL PERIOD. If x[n]
+is expressed with fundamental angular frequency omega_0 (radians/sample),
+the relationship to the fundamental period is:
+
+        N = 2*pi / omega_0          (only when this ratio is a positive
+                                       integer)
+
+IMPORTANT DT SUBTLETY (does NOT apply in CT):
+Unlike the CT case, not every nonzero omega_0 produces a periodic DT
+signal. The DT complex exponential x[n] = exp(j*omega_0*n) is periodic
+if and only if omega_0 / (2*pi) is a RATIONAL NUMBER, i.e.:
+
+        omega_0 / (2*pi) = p / q     where p, q are integers, q > 0,
+                                       expressed in lowest terms
+
+If this ratio is rational (p/q in lowest terms), the fundamental period
+is N = q * p / gcd(p,p) reduces simply to N = q (taking p,q coprime,
+fundamental period N = q). If omega_0/(2*pi) is irrational, x[n] is NOT
+periodic, even though the underlying CT analog exp(j*omega_0*t) always
+is periodic.
+
+SUM OF PERIODIC SIGNALS:
+If x(t) = x_1(t) + x_2(t), with fundamental periods T_1 and T_2, the
+sum is periodic if and only if T_1/T_2 is a rational number. The
+fundamental period of the sum is the least common multiple (LCM) of
+T_1 and T_2.
+
+-----------------------------------------------
+SECTION 3: ENERGY SIGNALS VS POWER SIGNALS
+-----------------------------------------------
+
+DEFINITION (Total Energy, CT):
+The total energy of a CT signal x(t) over all time is:
+
+        E_infinity = Integral from -infinity to infinity of |x(t)|^2 dt
+
+DEFINITION (Total Energy, DT):
+The total energy of a DT signal x[n] over all time is:
+
+        E_infinity = Sum from n = -infinity to infinity of |x[n]|^2
+
+DEFINITION (Average Power, CT):
+The time-averaged power of a CT signal is defined via the limiting
+operation:
+
+        P_infinity = lim (T -> infinity) of
+                     (1/(2*T)) * Integral from -T to T of |x(t)|^2 dt
+
+DEFINITION (Average Power, DT):
+        P_infinity = lim (N -> infinity) of
+                     (1/(2*N+1)) * Sum from n = -N to N of |x[n]|^2
+
+CLASSIFICATION RULES:
+1. ENERGY SIGNAL: x(t) (or x[n]) is an energy signal if and only if
+   0 < E_infinity < infinity. For an energy signal, it necessarily
+   follows that P_infinity = 0.
+
+2. POWER SIGNAL: x(t) (or x[n]) is a power signal if and only if
+   0 < P_infinity < infinity. For a power signal, it necessarily
+   follows that E_infinity = infinity (the energy is unbounded).
+
+3. A signal may be NEITHER an energy signal NOR a power signal (e.g.,
+   x(t) = t, the ramp function, has both infinite energy and infinite
+   power).
+
+4. Periodic signals (other than the trivial zero signal) are always
+   power signals, never energy signals, since the integral/sum of
+   |x(t)|^2 over all time diverges. For a periodic signal, the average
+   power can be computed equivalently using only one period:
+
+        P_infinity = (1/T) * Integral over one period T of |x(t)|^2 dt
+                                   (CT case)
+
+        P_infinity = (1/N) * Sum over one period N of |x[n]|^2
+                                   (DT case)
+
+-----------------------------------------------
+SECTION 4: EVEN AND ODD SIGNALS
+-----------------------------------------------
+
+DEFINITION (Even Signal):
+A signal x(t) is EVEN if and only if it satisfies the algebraic
+symmetry condition:
+
+        x(-t) = x(t)          for all t
+
+(Analogously for DT: x[-n] = x[n] for all n.) Even signals are
+symmetric about the vertical axis (t = 0).
+
+DEFINITION (Odd Signal):
+A signal x(t) is ODD if and only if it satisfies:
+
+        x(-t) = -x(t)          for all t
+
+(Analogously for DT: x[-n] = -x[n] for all n.) Odd signals are
+antisymmetric about the origin, and it follows directly from the
+definition that any odd signal must satisfy x(0) = 0 (in CT) or
+x[0] = 0 (in DT), since substituting t = 0 gives x(0) = -x(0), which
+forces x(0) = 0.
+
+EVEN-ODD DECOMPOSITION:
+Any signal x(t) can be uniquely decomposed into the sum of an even
+component and an odd component:
+
+        x(t) = x_e(t) + x_o(t)
+
+where the EVEN PART is extracted as:
+
+        x_e(t) = (1/2) * [ x(t) + x(-t) ]
+
+and the ODD PART is extracted as:
+
+        x_o(t) = (1/2) * [ x(t) - x(-t) ]
+
+(The identical formulas hold in discrete time, replacing t with n.)
+Verification: x_e(-t) = (1/2)*[x(-t)+x(t)] = x_e(t), confirming
+evenness; x_o(-t) = (1/2)*[x(-t)-x(t)] = -x_o(t), confirming oddness.
+
+-----------------------------------------------
+SECTION 5: LTI (LINEAR TIME-INVARIANT) SYSTEMS
+-----------------------------------------------
+
+Let a system be represented by an operator H such that the output is
+y(t) = H{x(t)} (CT) or y[n] = H{x[n]} (DT).
+
+DEFINITION (Linearity):
+A system is LINEAR if and only if it satisfies BOTH of the following
+properties simultaneously, for all valid inputs and all scalar
+constants:
+
+  (a) ADDITIVITY (Superposition):
+        If H{x_1(t)} = y_1(t) and H{x_2(t)} = y_2(t), then
+        H{x_1(t) + x_2(t)} = y_1(t) + y_2(t)
+
+  (b) HOMOGENEITY (Scaling):
+        For any complex constant a:
+        H{a * x(t)} = a * y(t)
+
+These two conditions are typically combined and tested jointly as the
+SUPERPOSITION PROPERTY:
+
+        H{a*x_1(t) + b*x_2(t)} = a*y_1(t) + b*y_2(t)
+
+for arbitrary constants a, b and arbitrary inputs x_1(t), x_2(t). A
+necessary consequence of linearity: H{0} = 0 (zero input produces
+zero output, assuming no independent sources internal to the system).
+
+DEFINITION (Time-Invariance):
+A system is TIME-INVARIANT if a time shift in the input signal causes
+an identical time shift in the output signal, with no other change.
+Formally: if H{x(t)} = y(t), then for any real shift t_0:
+
+        H{x(t - t_0)} = y(t - t_0)
+
+(Analogously in DT: if H{x[n]} = y[n], then H{x[n - n_0]} = y[n - n_0]
+for any integer shift n_0.) This means the system's behavior/rule does
+not depend on the absolute time origin.
+
+DEFINITION (LTI System):
+A system that is simultaneously LINEAR and TIME-INVARIANT is called an
+LTI system. LTI systems are of central importance because their
+input-output behavior is completely characterized by a single function:
+the impulse response h(t) (CT) or h[n] (DT), via the convolution
+operation:
+
+        y(t) = x(t) * h(t) = Integral from -infinity to infinity of
+                              x(tau) * h(t - tau) d(tau)
+
+        y[n] = x[n] * h[n] = Sum from k = -infinity to infinity of
+                              x[k] * h[n - k]
+
+-----------------------------------------------
+SECTION 6: SYSTEM PROPERTIES
+-----------------------------------------------
+
+PROPERTY (Memoryless / Static):
+A system is MEMORYLESS (or static) if the output at any time t depends
+only on the input at that SAME time t (and not on past or future input
+values). Formally, y(t) is a function of x(t) alone.
+Example: y(t) = x(t)^2 is memoryless. y(t) = x(t-1) is NOT memoryless
+(it has memory).
+
+PROPERTY (Memory / Dynamic):
+A system HAS MEMORY (is dynamic) if the output at time t can depend on
+input values at times other than t (i.e., on past and/or future input
+values, or on internal stored states such as capacitor voltages).
+
+PROPERTY (Causality):
+A system is CAUSAL if the output at any time t_0 depends ONLY on
+values of the input at the present time (t = t_0) and/or past times
+(t < t_0); it does NOT depend on future input values (t > t_0).
+Formally, for a causal system, if x_1(t) = x_2(t) for all t <= t_0,
+then it must follow that y_1(t_0) = y_2(t_0). All memoryless systems
+are causal, but not all causal systems are memoryless.
+For a causal LTI system specifically, the impulse response satisfies:
+
+        h(t) = 0     for all t < 0          (CT)
+        h[n] = 0     for all n < 0          (DT)
+
+PROPERTY (Stability — BIBO Stability):
+A system is BOUNDED-INPUT, BOUNDED-OUTPUT (BIBO) STABLE if every
+bounded input produces a bounded output. Formally: if there exists a
+finite constant B_x such that |x(t)| <= B_x for all t, then there
+must exist a finite constant B_y such that |y(t)| <= B_y for all t.
+
+BIBO STABILITY CONDITION FOR LTI SYSTEMS:
+An LTI system is BIBO stable if and only if its impulse response is
+ABSOLUTELY INTEGRABLE (CT case):
+
+        Integral from -infinity to infinity of |h(t)| dt < infinity
+
+or ABSOLUTELY SUMMABLE (DT case):
+
+        Sum from n = -infinity to infinity of |h[n]| < infinity
+
+This is both a necessary and sufficient condition for BIBO stability
+of an LTI system. If this integral/sum is unbounded, there exists at
+least one bounded input that produces an unbounded output.
+
+=====================================================================
+END OF FILE: signals_and_systems_basics.txt
+=====================================================================

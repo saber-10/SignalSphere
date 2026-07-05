@@ -1,0 +1,236 @@
+=====================================================================
+FILE: sampling_and_nyquist.txt
+TOPIC: Sampling of Continuous-Time Signals and the Nyquist Theorem
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: CONTINUOUS-TO-DISCRETE (C/D) CONVERSION VIA IMPULSE-TRAIN SAMPLING
+-----------------------------------------------
+
+CONCEPTUAL MODEL:
+The standard mathematical idealization of sampling represents the
+process as multiplying a continuous-time signal x(t) by a periodic
+impulse train p(t), consisting of unit impulses spaced T seconds apart
+(T is the SAMPLING PERIOD):
+
+        p(t) = Sum from n = -infinity to infinity of delta(t - n*T)
+
+The resulting IMPULSE-SAMPLED SIGNAL is:
+
+        x_s(t) = x(t) * p(t) = x(t) * Sum over n of delta(t - n*T)
+               = Sum from n = -infinity to infinity of
+                    x(n*T) * delta(t - n*T)
+
+Each impulse in x_s(t) is weighted by the value of x(t) at the
+corresponding sample instant n*T. This impulse-sampled signal x_s(t)
+is the standard mathematical model used to derive the frequency-domain
+consequences of sampling; the practical conversion to an actual
+discrete-time SEQUENCE is then simply:
+
+        x[n] = x(n*T)
+
+i.e., the sequence of weights of the impulses in x_s(t), reindexed as
+an ordinary discrete sequence.
+
+THE SAMPLING FREQUENCY:
+The (angular) SAMPLING FREQUENCY, corresponding to sampling period T,
+is defined as:
+
+        omega_s = 2*pi / T
+
+(with units of radians/second; the ordinary, non-angular sampling
+frequency in Hz is f_s = 1/T = omega_s / (2*pi)).
+
+-----------------------------------------------
+SECTION 2: MATHEMATICAL DERIVATION OF THE SAMPLED SIGNAL SPECTRUM
+-----------------------------------------------
+
+DERIVATION:
+Since x_s(t) = x(t) * p(t) is a PRODUCT (multiplication) of two
+time-domain signals, the CTFT Multiplication Property states that the
+spectrum of a time-domain product equals the (1/(2*pi)-scaled)
+CONVOLUTION of the individual spectra in the frequency domain:
+
+        X_s(j*omega) = (1/(2*pi)) * [ X(j*omega) * P(j*omega) ]
+
+where "*" here denotes frequency-domain convolution.
+
+The CTFT of the periodic impulse train p(t) (itself periodic with
+period T) is, by the standard CTFT pair for a periodic impulse train,
+ALSO a periodic impulse train in the frequency domain:
+
+        P(j*omega) = omega_s * Sum from k = -infinity to infinity of
+                      delta(omega - k*omega_s)
+
+Substituting P(j*omega) into the convolution and using the sifting
+property of the impulse function under convolution (convolving any
+function with a shifted/scaled delta train reproduces shifted/scaled
+copies of that function):
+
+        X_s(j*omega) = (1/(2*pi)) * X(j*omega) * 
+                        [ omega_s * Sum over k of delta(omega - k*omega_s) ]
+
+              = (omega_s / (2*pi)) * Sum over k of X(j*(omega - k*omega_s))
+
+Since omega_s = 2*pi/T, the prefactor omega_s/(2*pi) simplifies exactly
+to 1/T, giving the FINAL RESULT:
+
+        X_s(j*omega) = (1/T) * Sum from k = -infinity to infinity of
+                        X(j*(omega - k*omega_s))
+
+INTERPRETATION:
+The spectrum of the impulse-sampled signal, X_s(j*omega), consists of
+an infinite number of exact (scaled-by-1/T) COPIES of the original
+spectrum X(j*omega), each copy shifted by an integer multiple k of the
+sampling frequency omega_s, and superimposed (summed) together. This
+periodic replication of the spectrum is the central mathematical fact
+underlying all sampling theory.
+
+-----------------------------------------------
+SECTION 3: THE NYQUIST SAMPLING THEOREM
+-----------------------------------------------
+
+SETUP — BAND-LIMITED SIGNALS:
+Let x(t) be BAND-LIMITED, meaning its CTFT satisfies:
+
+        X(j*omega) = 0      for all |omega| > omega_m
+
+where omega_m is the highest (maximum) frequency component present in
+x(t).
+
+STATEMENT OF THE THEOREM:
+Given the spectral replication result of Section 2, the shifted copies
+of X(j*omega) in X_s(j*omega) are centered at omega = 0, +/- omega_s,
++/- 2*omega_s, and so on, with EACH COPY occupying the frequency range
+[-omega_m, +omega_m] around its center. To avoid these adjacent copies
+OVERLAPPING with one another (an effect called ALIASING, discussed in
+Section 4), the spacing between adjacent copies (which is exactly
+omega_s) must be large enough that the copy centered at 0 (occupying
+up to +omega_m) does not overlap with the copy centered at omega_s
+(occupying down to omega_s - omega_m). This non-overlap condition
+requires:
+
+        omega_m < omega_s - omega_m
+   =>   omega_s > 2 * omega_m
+
+THE NYQUIST SAMPLING THEOREM therefore states: a band-limited
+continuous-time signal x(t), with no frequency content at or above
+omega_m, is UNIQUELY AND EXACTLY RECOVERABLE from its samples x(nT) if
+and only if the sampling frequency satisfies the STRICT inequality:
+
+        omega_s > 2 * omega_m
+
+NYQUIST RATE DEFINITION:
+The quantity 2*omega_m (exactly twice the maximum frequency component
+of the band-limited signal) is defined as the NYQUIST RATE:
+
+        Nyquist Rate = 2 * omega_m
+
+Sampling at exactly the Nyquist rate (omega_s = 2*omega_m, satisfying
+equality rather than strict inequality) is generally INSUFFICIENT for
+guaranteed perfect reconstruction in the general case (e.g., a pure
+cosine at exactly omega_m sampled at exactly omega_s = 2*omega_m can
+alias to zero, depending on the sampling phase), which is precisely
+why the theorem's sufficient condition for guaranteed reconstruction
+is stated as the strict inequality omega_s > 2*omega_m.
+
+-----------------------------------------------
+SECTION 4: ALIASING
+-----------------------------------------------
+
+DEFINITION AND MECHANISM:
+ALIASING occurs whenever the Nyquist condition is violated, i.e.,
+whenever:
+
+        omega_s <= 2 * omega_m
+
+In this case, the spectral copies in X_s(j*omega) = (1/T) * Sum over k
+of X(j*(omega - k*omega_s)) are spaced too closely together (by
+omega_s) relative to their width (2*omega_m), so ADJACENT REPLICAS
+OVERLAP AND ADD TOGETHER in the overlapping frequency regions.
+
+MECHANICAL CONSEQUENCE:
+Once overlap occurs, the high-frequency content of x(t) (frequency
+components near and above omega_s/2) gets folded back and superimposed
+on top of, and becomes indistinguishable from, genuine LOWER-FREQUENCY
+content within the baseband region. Specifically, a true frequency
+component at omega_0 (where omega_s/2 < omega_0 <= omega_s) will, after
+sampling, appear (alias) at the lower apparent frequency:
+
+        omega_alias = omega_s - omega_0     (for omega_0 in the range
+                                                described above, folding
+                                                about omega_s/2)
+
+More generally, any original frequency component "masquerades" as a
+different, lower frequency that is indistinguishable, after sampling,
+from a genuinely low-frequency signal at that aliased frequency.
+
+DESTRUCTIVE, IRREVERSIBLE NATURE OF ALIASING:
+Once the overlapping copies have summed together in the sampled
+spectrum, the original, unaliased spectral content CANNOT be recovered
+by any subsequent processing (such as filtering) applied to the
+samples — the overlap has irreversibly corrupted/destroyed the
+original information in the overlapping frequency band. This is why
+anti-aliasing analog low-pass filters are placed before the sampler in
+practical systems: to forcibly band-limit x(t) (removing or
+attenuating content above omega_s/2) BEFORE sampling occurs, since
+aliasing cannot be undone after the fact.
+
+-----------------------------------------------
+SECTION 5: IDEAL SIGNAL RECONSTRUCTION
+-----------------------------------------------
+
+ROLE OF THE IDEAL LOW-PASS FILTER:
+Provided the Nyquist condition omega_s > 2*omega_m is satisfied, the
+copies of X(j*omega) in X_s(j*omega) are non-overlapping, and the
+original spectrum X(j*omega) — and hence x(t) itself — can be EXACTLY
+recovered from the samples by passing the impulse-sampled signal
+x_s(t) through an IDEAL LOW-PASS FILTER H_r(j*omega) with the
+following exact specifications:
+
+        H_r(j*omega) = T          for |omega| < omega_s / 2
+        H_r(j*omega) = 0          for |omega| > omega_s / 2
+
+   - CUTOFF FREQUENCY: omega_s / 2 (also called the "folding
+     frequency" or "Nyquist frequency" of the sampling system); this
+     cutoff must be chosen to pass the entire k=0 copy of X(j*omega)
+     (which occupies up to omega_m, and omega_m < omega_s/2 is
+     guaranteed by the Nyquist condition) while rejecting/blocking all
+     other (k != 0) shifted copies.
+   - PASSBAND GAIN: exactly T (the sampling period); this specific
+     gain value is required to exactly cancel the 1/T scaling factor
+     present in X_s(j*omega) (derived in Section 2), so that the
+     filter output spectrum exactly equals X(j*omega), and hence the
+     filter's time-domain output exactly equals the original x(t).
+
+TIME-DOMAIN RECONSTRUCTION — WHITTAKER-SHANNON INTERPOLATION:
+The impulse response of the ideal reconstruction low-pass filter
+described above, h_r(t), is (by the standard inverse-CTFT of an ideal
+low-pass filter) a SINC FUNCTION:
+
+        h_r(t) = sinc(t / T)
+
+(using the convention sinc(x) = sin(pi*x) / (pi*x), which satisfies
+sinc(0) = 1 and sinc(integer) = 0 for any nonzero integer).
+
+Since the reconstruction filter's output x(t) is obtained by
+convolving the impulse-sampled signal x_s(t) = Sum over n of x(nT) *
+delta(t - nT) with this impulse response h_r(t), and convolution with
+a delta function simply shifts and reproduces the impulse response, the
+result is the WHITTAKER-SHANNON INTERPOLATION FORMULA:
+
+        x(t) = Sum from n = -infinity to infinity of
+               x(n*T) * sinc( (t - n*T) / T )
+
+INTERPRETATION:
+This formula exactly reconstructs the continuous-time signal x(t), for
+ALL real-valued t (not just at the sample points), as a weighted sum
+of time-shifted sinc functions, where each sinc function is centered
+exactly at a sample instant n*T and weighted by the corresponding
+sample value x(nT). This is the precise mathematical sense in which a
+properly band-limited, properly sampled (Nyquist-satisfying) signal is
+said to be "perfectly reconstructible" from its discrete samples alone.
+
+=====================================================================
+END OF FILE: sampling_and_nyquist.txt
+=====================================================================

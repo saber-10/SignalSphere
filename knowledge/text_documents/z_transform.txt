@@ -1,0 +1,269 @@
+=====================================================================
+FILE: z_transform.txt
+TOPIC: The Z-Transform and Its Application to Discrete-Time LTI Systems
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: BILATERAL (TWO-SIDED) Z-TRANSFORM
+-----------------------------------------------
+
+ANALYSIS EQUATION:
+The bilateral z-transform of a DT signal x[n] is defined as:
+
+        X(z) = Sum from n = -infinity to infinity of x[n] * z^(-n)
+
+where z is a complex variable. It is conventional to express z in
+polar form:
+
+        z = r * exp(j*omega)
+
+with r = |z| (a non-negative real magnitude) and omega = the angle of
+z (in radians). Substituting z = r*exp(j*omega) into the analysis
+equation shows that X(z), evaluated on a circle of radius r, equals
+the DTFT of the sequence x[n]*r^(-n):
+
+        X(r*e^(j*omega)) = Sum over n of [x[n]*r^(-n)] * exp(-j*omega*n)
+
+This is precisely why the z-transform exists for many sequences whose
+ordinary DTFT does not converge: an appropriately chosen radius r
+provides convergence. As a direct special case, when r = 1 (i.e.,
+evaluating X(z) on the unit circle |z| = 1, so z = exp(j*omega)), the
+z-transform reduces exactly to the DTFT:
+
+        X(z) |_(z = exp(j*omega)) = X(e^(j*omega))      [the DTFT]
+
+provided the unit circle lies within the ROC of X(z).
+
+The bilateral z-transform, like the bilateral Laplace transform,
+requires its associated Region of Convergence (ROC) to be specified
+for x[n] to be uniquely determined from X(z) (see Section 2).
+
+-----------------------------------------------
+SECTION 2: REGION OF CONVERGENCE (ROC) — CORE RULES
+-----------------------------------------------
+
+The ROC is the set of all values of z = r*exp(j*omega) for which the
+defining sum converges absolutely (Sum of |x[n]*z^(-n)| < infinity).
+
+RULE 1 — RING OR DISK CENTERED AT THE ORIGIN:
+The ROC of X(z) consists of a RING (annulus) — or, as special/limiting
+cases, a DISK or the exterior of a disk extending to infinity — in
+the z-plane, CENTERED AT THE ORIGIN. This follows because convergence
+of the z-transform sum depends only on |z| = r (the magnitude of z),
+not on its angle omega (since |z^(-n)| = r^(-n) is independent of
+omega); therefore if any point z_1 with |z_1| = r_1 lies in the ROC,
+every point with that same magnitude r_1 (any angle) also lies in the
+ROC, producing the characteristic ring/annulus shape:
+
+        r_1 < |z| < r_2     (general ring form)
+
+RULE 2 — THE ROC CONTAINS NO POLES:
+The ROC can never contain any pole of X(z), since X(z) is undefined
+(infinite) at a pole, so the defining sum cannot converge there.
+
+RULE 3 — FINITE-DURATION SIGNALS:
+If x[n] is of finite duration (nonzero over only a finite range of
+n), the ROC is the ENTIRE z-PLANE, except possibly the points z = 0
+and/or z = infinity. Specifically:
+   - z = 0 is excluded if x[n] has any nonzero value for n > 0
+     (positive powers of n in x[n]*z^(-n) produce negative powers of
+     z, which blow up as z -> 0).
+   - z = infinity is excluded if x[n] has any nonzero value for n < 0
+     (negative-index terms produce positive powers of z, which blow
+     up as z -> infinity).
+
+RULE 4 — RIGHT-SIDED SIGNALS:
+If x[n] is right-sided (x[n] = 0 for n < N_1, for some finite N_1),
+and X(z) has at least one pole, the ROC is the region OUTSIDE the
+circle defined by the pole of largest magnitude:
+
+        |z| > max( |pole| )      i.e.   |z| > r_max
+
+where r_max is the magnitude of the pole farthest from the origin.
+The ROC extends from this circle all the way out to |z| = infinity
+(infinity is included in the ROC if and only if x[n] is also causal,
+i.e., N_1 >= 0).
+
+RULE 5 — LEFT-SIDED SIGNALS:
+If x[n] is left-sided (x[n] = 0 for n > N_2, for some finite N_2), and
+X(z) has at least one pole, the ROC is the region INSIDE the circle
+defined by the pole of smallest magnitude:
+
+        |z| < min( |pole| )      i.e.   |z| < r_min
+
+where r_min is the magnitude of the pole closest to the origin. The
+ROC extends from this circle inward to (and possibly including) z = 0
+(z=0 is included in the ROC if and only if x[n] is zero for all n>0,
+i.e. x[n] is "anti-causal").
+
+RULE 6 — TWO-SIDED SIGNALS:
+If x[n] is two-sided (neither right-sided nor left-sided), the ROC, if
+it exists, is a RING bounded by two pole magnitudes:
+
+        r_1 < |z| < r_2
+
+where the signal is decomposed into a right-sided part (producing the
+inner boundary r_1, from the relevant outward-extending pole) and a
+left-sided part (producing the outer boundary r_2, from the relevant
+inward-extending pole). As with the Laplace case, it is possible for
+no valid ROC to exist for certain two-sided sequences.
+
+-----------------------------------------------
+SECTION 3: LTI SYSTEM ANALYSIS USING THE Z-TRANSFORM
+-----------------------------------------------
+
+TRANSFER FUNCTION:
+For a DT LTI system with impulse response h[n], input x[n], and output
+y[n] = x[n] * h[n] (DT convolution), the system's TRANSFER FUNCTION is
+the z-transform of the impulse response, equivalently the ratio of
+output to input transforms:
+
+        H(z) = Y(z) / X(z) = Z{h[n]}
+
+(This follows from the convolution property: Y(z) = X(z) * H(z), see
+Section 4.)
+
+CONDITION FOR BIBO STABILITY:
+A DT LTI system (with rational transfer function H(z)) is BIBO stable
+if and only if the ROC of H(z) INCLUDES THE UNIT CIRCLE, i.e.:
+
+        |z| = 1     must lie within the ROC
+
+This follows because BIBO stability requires absolute summability of
+h[n] (Sum of |h[n]| < infinity, see signals_and_systems_basics.txt),
+which is exactly the condition for the z-transform sum defining H(z)
+to converge when evaluated on the unit circle (r = 1).
+
+For a CAUSAL system specifically, this stability condition simplifies
+to: ALL POLES OF H(z) MUST LIE STRICTLY INSIDE THE UNIT CIRCLE (i.e.,
+every pole must satisfy |pole| < 1). This follows from Rule 4 above
+(causal => ROC is |z| > r_max) combined with the requirement that the
+unit circle lie in this ROC (1 > r_max, i.e., every pole magnitude is
+strictly less than 1).
+
+CONDITION FOR CAUSALITY:
+A DT LTI system with rational H(z) is CAUSAL if and only if its ROC is
+the EXTERIOR OF A CIRCLE EXTENDING TO INFINITY, i.e., of the form:
+
+        ROC: |z| > r_max     (and this region must include z = infinity)
+
+This follows directly from Rule 4 in Section 2, since causality
+requires h[n] = 0 for n < 0, i.e., h[n] is right-sided (and, being
+causal, the ROC must also include the point at infinity).
+
+-----------------------------------------------
+SECTION 4: CORE PROPERTIES OF THE Z-TRANSFORM
+-----------------------------------------------
+
+Notation: x[n] <---> X(z), with ROC = R, denotes a z-transform pair
+and its associated region of convergence.
+
+--- 4.1 LINEARITY ---
+
+        a*x_1[n] + b*x_2[n]  <--->  a*X_1(z) + b*X_2(z)
+
+        ROC: contains at least the intersection R_1 intersect R_2
+             (may be larger if pole-zero cancellation occurs)
+
+--- 4.2 TIME SHIFTING ---
+
+        x[n - n_0]  <--->  z^(-n_0) * X(z)
+
+        ROC: same as ROC of X(z), except for the possible
+             addition/deletion of the points z=0 or z=infinity,
+             depending on the sign of n_0 (e.g., a delay, n_0 > 0,
+             may introduce a pole at z=0; an advance, n_0 < 0, may
+             introduce a pole at z=infinity).
+
+        SPECIFIC CASE (single-sample delay, n_0 = 1):
+        x[n - 1]  <--->  z^(-1) * X(z)
+        (This is the basis for representing delay elements in
+        discrete-time block diagrams and digital filter structures.)
+
+--- 4.3 SCALING IN THE z-DOMAIN ---
+
+        a^n * x[n]  <--->  X(z / a)
+
+        ROC: the original ROC, scaled in magnitude by |a|; if original
+             ROC is r_1 < |z| < r_2, the new ROC is
+             |a|*r_1 < |z| < |a|*r_2.
+
+(SPECIAL CASE — frequency-domain rotation/modulation, when a =
+exp(j*omega_0)):
+        exp(j*omega_0*n) * x[n]  <--->  X(z * exp(-j*omega_0))
+
+--- 4.4 CONVOLUTION ---
+
+        y[n] = x[n] * h[n]   <--->   Y(z) = X(z) * H(z)
+
+        (the left "*" denotes DT time-domain convolution; the right
+        "*" denotes ordinary multiplication of the two z-transforms)
+
+        ROC of Y(z): contains at least the intersection of ROC{X(z)}
+                     and ROC{H(z)}
+
+--- 4.5 TIME REVERSAL ---
+
+        x[-n]  <--->  X(1/z)
+
+        ROC: the RECIPROCAL of the original ROC; if the original ROC
+             is r_1 < |z| < r_2, the new ROC is
+             1/r_2 < |z| < 1/r_1.
+
+-----------------------------------------------
+SECTION 5: COMMON Z-TRANSFORM PAIRS (with ROC)
+-----------------------------------------------
+
+(1) Unit Impulse:
+        delta[n]   <--->   1
+        ROC: entire z-plane (all z)
+
+(2) Unit Step:
+        u[n]   <--->   1 / (1 - z^(-1))     =     z / (z - 1)
+        ROC: |z| > 1
+        (Single pole at z = 1.)
+
+(3) Causal Real Geometric Sequence:
+        a^n * u[n]   <--->   1 / (1 - a*z^(-1))     =     z / (z - a)
+        ROC: |z| > |a|
+        (Single pole at z = a; ROC is the exterior of the circle of
+        radius |a|, consistent with Rule 4 — right-sided signal.)
+
+(4) Anti-Causal Real Geometric Sequence:
+        -a^n * u[-n - 1]   <--->   1 / (1 - a*z^(-1))     =     z / (z - a)
+        ROC: |z| < |a|
+        (IDENTICAL algebraic expression for X(z) as pair (3) above,
+        but with a DIFFERENT, interior ROC. This is the canonical
+        demonstration that X(z) alone does NOT uniquely determine
+        x[n] — the ROC must always be specified together with X(z)
+        to obtain a unique inverse z-transform. Note the time-domain
+        sequence here is left-sided, using u[-n-1], which equals 1 for
+        n <= -1 and 0 for n >= 0, consistent with Rule 5 — left-sided
+        signal, ROC interior to the pole.)
+
+(5) n-Weighted Causal Geometric Sequence:
+        n * a^n * u[n]   <--->   a*z^(-1) / (1 - a*z^(-1))^2
+                            =    a*z / (z - a)^2
+        ROC: |z| > |a|
+        (Obtained by applying the differentiation-in-z-domain
+        property, -z*d/dz, to pair (3); this introduces a
+        repeated/second-order pole at z = a, but the ROC boundary
+        condition |z| > |a| remains the same as the un-weighted case.)
+
+(6) Causal Sine Sequence:
+        sin(omega_0*n) * u[n]   <--->
+              [ z^(-1) * sin(omega_0) ] /
+              [ 1 - 2*z^(-1)*cos(omega_0) + z^(-2) ]
+        ROC: |z| > 1
+        (Complex-conjugate pole pair at z = exp(+/- j*omega_0), both
+        of magnitude 1.)
+
+(7) Causal Cosine Sequence:
+        cos(omega_0*n) * u[n]   <--->
+              [ 1 - z^(-1)*cos(omega_0) ] /
+              [ 1 - 2*z^(-1)*cos(omega_0) + z^(-2) ]
+        ROC: |z| > 1
+
+=====================================================================
+END OF FILE: z_transform.txt
+=====================================================================

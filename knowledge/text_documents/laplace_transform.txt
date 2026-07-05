@@ -1,0 +1,308 @@
+=====================================================================
+FILE: laplace_transform.txt
+TOPIC: The Laplace Transform and Its Application to LTI Systems
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: BILATERAL (TWO-SIDED) LAPLACE TRANSFORM
+-----------------------------------------------
+
+ANALYSIS EQUATION:
+The bilateral Laplace transform of a CT signal x(t) is defined as:
+
+        X(s) = Integral from -infinity to infinity of
+               x(t) * exp(-s*t) dt
+
+where s is a complex variable, decomposed into real and imaginary
+parts as:
+
+        s = sigma + j*omega
+
+with sigma = Real(s) and omega = Imag(s). The Laplace transform can be
+interpreted as the CTFT of x(t) multiplied by a real exponential
+weighting factor exp(-sigma*t); that is, X(sigma + j*omega) is the
+CTFT of [x(t) * exp(-sigma*t)]. This is precisely why the Laplace
+transform exists for many signals (e.g., growing exponentials) for
+which the ordinary CTFT does not converge: an appropriately chosen
+sigma can force convergence.
+
+The bilateral transform always requires specification of an associated
+Region of Convergence (ROC); X(s) alone, without its ROC, does not
+uniquely determine x(t) (see Section 3).
+
+-----------------------------------------------
+SECTION 2: UNILATERAL (ONE-SIDED) LAPLACE TRANSFORM
+-----------------------------------------------
+
+ANALYSIS EQUATION:
+The unilateral (one-sided) Laplace transform is defined with the lower
+integration bound at 0- (just prior to t=0, so as to correctly capture
+any impulse or discontinuity located exactly at the origin):
+
+        X(s) = Integral from 0- to infinity of x(t) * exp(-s*t) dt
+
+PRIMARY USE CASE:
+The unilateral transform is the standard tool for solving linear
+constant-coefficient differential equations WITH SPECIFIED INITIAL
+CONDITIONS (e.g., circuit analysis problems where initial capacitor
+voltages or inductor currents at t=0- are given). Because the
+integration bound effectively ignores x(t) for t < 0, the unilateral
+transform implicitly assumes (or enforces) a "causal-from-this-point"
+viewpoint, and its differentiation property directly incorporates
+initial conditions (see Section 5), which is precisely what is needed
+to solve initial-value problems directly in the s-domain without first
+solving for the homogeneous and particular solutions separately in the
+time domain.
+
+KEY DISTINCTION FROM BILATERAL TRANSFORM:
+For any signal that is zero for t < 0 (i.e., already causal), the
+unilateral and bilateral transforms coincide exactly. For signals that
+are nonzero for t < 0, the two transforms generally differ, and the
+unilateral transform technically discards information about the
+signal's behavior prior to t = 0- (or, for one-sided problems, that
+information is simply not part of the problem definition). Unlike the
+bilateral transform, the unilateral transform does NOT require an
+explicit ROC to be quoted for uniqueness in standard problems, since
+it is implicitly assumed the ROC is always a right-half-plane
+(consistent with assumed causality from 0- onward).
+
+-----------------------------------------------
+SECTION 3: REGION OF CONVERGENCE (ROC) — CORE RULES
+-----------------------------------------------
+
+The ROC is defined as the set of all values of s = sigma + j*omega for
+which the defining integral X(s) = Integral of x(t)*exp(-s*t) dt
+converges absolutely (i.e., Integral of |x(t)*exp(-s*t)| dt < infinity).
+
+RULE 1 — STRIPS PARALLEL TO THE j*omega AXIS:
+The ROC of X(s) consists of strips in the s-plane that are parallel to
+the j*omega (imaginary) axis. This follows because convergence of the
+Laplace integral depends only on the real part of s (i.e., on sigma =
+Real(s), since |exp(-s*t)| = exp(-sigma*t) does not depend on omega);
+therefore, if any point s_1 = sigma_1 + j*omega_1 lies in the ROC, then
+every point with the same real part sigma_1 (for any omega) also lies
+in the ROC.
+
+RULE 2 — THE ROC CONTAINS NO POLES:
+The ROC can never contain any pole of X(s), since X(s) is, by
+definition, infinite (undefined) at a pole, and therefore the defining
+integral cannot converge there.
+
+RULE 3 — FINITE-DURATION SIGNALS:
+If x(t) is of finite duration (i.e., x(t) = 0 outside some finite
+interval [T_1, T_2]) and is absolutely integrable on that interval,
+then the ROC is the ENTIRE s-PLANE, except possibly the single points
+s = 0 and/or s = infinity (s=0 may be excluded if X(s) has a pole
+there from a term like 1/s arising from a step-like discontinuity at
+an endpoint, and the behavior at s = infinity must be separately
+checked if asked about convergence "at infinity," though in standard
+ROC statements covering the finite s-plane, x=0 is the only practical
+exclusion to watch for).
+
+RULE 4 — RIGHT-SIDED SIGNALS:
+If x(t) is right-sided (x(t) = 0 for t < T_1, for some finite T_1),
+and X(s) has at least one pole, the ROC is a right-half-plane of the
+form:
+
+        Real(s) > sigma_max
+
+where sigma_max is the real part of the rightmost (largest real-part)
+pole of X(s). The ROC extends to the right of the rightmost pole, all
+the way to Real(s) = +infinity.
+
+RULE 5 — LEFT-SIDED SIGNALS:
+If x(t) is left-sided (x(t) = 0 for t > T_2, for some finite T_2), and
+X(s) has at least one pole, the ROC is a left-half-plane of the form:
+
+        Real(s) < sigma_min
+
+where sigma_min is the real part of the leftmost (smallest real-part)
+pole of X(s). The ROC extends to the left of the leftmost pole, all
+the way to Real(s) = -infinity.
+
+RULE 6 — TWO-SIDED (DOUBLY INFINITE) SIGNALS:
+If x(t) is two-sided (neither right-sided nor left-sided, extending
+indefinitely in both directions), the ROC, if it exists at all, is a
+VERTICAL STRIP in the s-plane:
+
+        sigma_1 < Real(s) < sigma_2
+
+bounded on both sides by poles of X(s) (specifically, the ROC strip
+lies between two poles, with no other poles inside the strip; the
+signal can be decomposed into a right-sided part contributing the
+left boundary sigma_1 and a left-sided part contributing the right
+boundary sigma_2). It is possible for a two-sided signal to have NO
+valid ROC at all, in which case its bilateral Laplace transform does
+not exist.
+
+-----------------------------------------------
+SECTION 4: LTI SYSTEM ANALYSIS USING THE LAPLACE TRANSFORM
+-----------------------------------------------
+
+TRANSFER FUNCTION:
+For an LTI system with impulse response h(t), input x(t), and output
+y(t) = x(t) * h(t) (convolution), the system's TRANSFER FUNCTION is
+defined as the Laplace transform of the impulse response, equivalently
+expressed as the ratio of output to input transforms:
+
+        H(s) = Y(s) / X(s) = L{h(t)}
+
+(This follows from the convolution property: Y(s) = X(s) * H(s), see
+Section 5.)
+
+CONDITION FOR BIBO STABILITY:
+An LTI system (with rational transfer function H(s)) is BIBO stable
+if and only if the ROC of H(s) includes the entire j*omega axis
+(i.e., Real(s) = 0 must lie within the ROC). This is because BIBO
+stability requires absolute integrability of h(t) (Integral of |h(t)|
+dt < infinity, see signals_and_systems_basics.txt), which is precisely
+the condition for the Laplace integral defining H(s) to converge when
+evaluated along s = j*omega (sigma = 0).
+
+CONDITION FOR CAUSALITY:
+An LTI system with a RATIONAL transfer function H(s) is CAUSAL if and
+only if its ROC is a RIGHT-HALF PLANE located to the right of the
+rightmost pole of H(s):
+
+        ROC: Real(s) > sigma_max  (where sigma_max = real part of the
+                                     rightmost pole)
+
+This follows directly from Rule 4 in Section 3, since causality
+requires h(t) = 0 for t < 0, i.e., h(t) is right-sided.
+
+IMPORTANT COMBINED CASE — CAUSAL AND STABLE:
+For a causal LTI system with rational H(s) to ALSO be BIBO stable,
+ALL poles of H(s) must lie strictly in the LEFT-HALF of the s-plane
+(i.e., every pole must satisfy Real(pole) < 0). This is because the
+ROC for a causal system is Real(s) > sigma_max, and for this ROC to
+contain the j*omega axis (Real(s)=0), it is required that sigma_max <
+0, meaning the rightmost pole — and hence every pole — has negative
+real part.
+
+-----------------------------------------------
+SECTION 5: CORE PROPERTIES OF THE LAPLACE TRANSFORM
+-----------------------------------------------
+
+Notation: x(t) <---> X(s), with ROC = R, denotes a Laplace transform
+pair and its associated region of convergence.
+
+--- 5.1 LINEARITY ---
+
+        a*x_1(t) + b*x_2(t)  <--->  a*X_1(s) + b*X_2(s)
+
+        ROC: contains the intersection of ROC{x_1} and ROC{x_2}
+             (R_1 intersect R_2); the ROC of the sum may be LARGER
+             than this intersection if pole-zero cancellation occurs.
+
+--- 5.2 TIME SHIFTING ---
+
+        x(t - t_0)  <--->  exp(-s*t_0) * X(s)
+
+        ROC: unchanged (same as ROC of X(s))
+
+--- 5.3 SHIFTING IN THE s-DOMAIN ---
+
+        exp(s_0*t) * x(t)  <--->  X(s - s_0)
+
+        ROC: shifted version of the original ROC, i.e.,
+             ROC{x(t)} shifted by Real(s_0); if original ROC is
+             Real(s) > sigma_0, the new ROC is Real(s) > sigma_0 +
+             Real(s_0).
+
+--- 5.4 DIFFERENTIATION IN TIME ---
+
+For the BILATERAL transform:
+
+        d/dt [x(t)]  <--->  s * X(s)
+
+        ROC: contains at least R (may be larger if a pole at s=0 is
+             cancelled by the differentiation)
+
+For the UNILATERAL transform (incorporating the initial condition,
+critical for solving differential equations):
+
+        d/dt [x(t)]  <--->  s * X(s) - x(0-)
+
+where x(0-) denotes the value of x(t) evaluated at t = 0-,
+immediately prior to t=0 (this correctly captures any discontinuity
+or impulse occurring exactly at the origin). For the second derivative:
+
+        d^2/dt^2 [x(t)]  <--->  s^2 * X(s) - s*x(0-) - x'(0-)
+
+where x'(0-) is the derivative of x(t) evaluated at t=0-.
+
+--- 5.5 INTEGRATION IN TIME ---
+
+For the bilateral transform:
+
+        Integral from -infinity to t of x(tau) d(tau)  <--->
+                (1/s) * X(s)
+
+        ROC: contains the intersection of R and the half-plane
+             Real(s) > 0 (an additional pole may be introduced at
+             s = 0 by the integration operation).
+
+For the unilateral transform (integrating from 0- to t):
+
+        Integral from 0- to t of x(tau) d(tau)  <--->  (1/s) * X(s)
+
+-----------------------------------------------
+SECTION 6: COMMON LAPLACE TRANSFORM PAIRS (with ROC)
+-----------------------------------------------
+
+(1) Unit Impulse:
+        delta(t)   <--->   1
+        ROC: entire s-plane
+
+(2) Unit Step:
+        u(t)   <--->   1/s
+        ROC: Real(s) > 0
+
+(3) Ramp:
+        t * u(t)   <--->   1/s^2
+        ROC: Real(s) > 0
+
+(4) Real Causal Exponential:
+        exp(-a*t) * u(t)   <--->   1 / (s + a)
+        ROC: Real(s) > -Real(a)
+        (Pole located at s = -a; ROC is the right-half plane to the
+        right of this single pole, consistent with Rule 4.)
+
+(5) Real Anti-Causal (Left-Sided) Exponential:
+        -exp(-a*t) * u(-t)   <--->   1 / (s + a)
+        ROC: Real(s) < -Real(a)
+        (Identical algebraic expression for X(s) as pair (4), but a
+        DIFFERENT, left-half-plane ROC, demonstrating that X(s) alone
+        does NOT uniquely specify x(t) — the ROC must always be
+        specified together with X(s).)
+
+(6) Sine Function:
+        sin(omega_0*t) * u(t)   <--->   omega_0 / (s^2 + omega_0^2)
+        ROC: Real(s) > 0
+        (Poles at s = +j*omega_0 and s = -j*omega_0, both purely
+        imaginary; the ROC lies to the right of the rightmost pole,
+        whose real part is 0.)
+
+(7) Cosine Function:
+        cos(omega_0*t) * u(t)   <--->   s / (s^2 + omega_0^2)
+        ROC: Real(s) > 0
+        (Same pole locations as pair (6): s = +/- j*omega_0.)
+
+(8) Exponentially Damped Sine:
+        exp(-a*t) * sin(omega_0*t) * u(t)   <--->
+                omega_0 / [ (s+a)^2 + omega_0^2 ]
+        ROC: Real(s) > -Real(a)
+        (Poles at s = -a +/- j*omega_0.)
+
+(9) Exponentially Damped Cosine:
+        exp(-a*t) * cos(omega_0*t) * u(t)   <--->
+                (s + a) / [ (s+a)^2 + omega_0^2 ]
+        ROC: Real(s) > -Real(a)
+
+(10) t-Weighted Causal Exponential:
+        t * exp(-a*t) * u(t)   <--->   1 / (s + a)^2
+        ROC: Real(s) > -Real(a)
+
+=====================================================================
+END OF FILE: laplace_transform.txt
+=====================================================================

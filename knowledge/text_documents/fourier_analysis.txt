@@ -1,0 +1,262 @@
+=====================================================================
+FILE: fourier_analysis.txt
+TOPIC: Continuous-Time and Discrete-Time Fourier Transforms
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: CONTINUOUS-TIME FOURIER TRANSFORM (CTFT)
+-----------------------------------------------
+
+ANALYSIS EQUATION (Forward Transform):
+The CTFT of a CT signal x(t) is defined as:
+
+        X(j*omega) = Integral from -infinity to infinity of
+                     x(t) * exp(-j*omega*t) dt
+
+This decomposes x(t) into its constituent complex exponential
+frequency components, where omega is real-valued angular frequency
+(radians/second), omega in (-infinity, infinity).
+
+SYNTHESIS EQUATION (Inverse Transform):
+The original signal is recovered from its CTFT via:
+
+        x(t) = (1/(2*pi)) * Integral from -infinity to infinity of
+               X(j*omega) * exp(j*omega*t) d(omega)
+
+EXISTENCE NOTE: The CTFT exists (converges) for any x(t) that is
+absolutely integrable (Integral of |x(t)| dt < infinity), satisfies
+the Dirichlet conditions, or more generally for signals of finite
+energy. For certain signals that are not absolutely integrable but
+are bounded and of practical interest (e.g., delta(t), u(t),
+sinusoids), the CTFT exists in a generalized sense, typically
+involving impulse functions in the frequency domain.
+
+-----------------------------------------------
+SECTION 2: DISCRETE-TIME FOURIER TRANSFORM (DTFT)
+-----------------------------------------------
+
+ANALYSIS EQUATION (Forward Transform):
+The DTFT of a DT signal x[n] is defined as:
+
+        X(e^(j*omega)) = Sum from n = -infinity to infinity of
+                          x[n] * exp(-j*omega*n)
+
+SYNTHESIS EQUATION (Inverse Transform):
+The original sequence is recovered via integration over exactly one
+period of length 2*pi:
+
+        x[n] = (1/(2*pi)) * Integral from -pi to pi of
+               X(e^(j*omega)) * exp(j*omega*n) d(omega)
+
+CRITICAL PROPERTY — PERIODICITY OF THE DTFT:
+Unlike the CTFT, the DTFT X(e^(j*omega)) is ALWAYS PERIODIC IN omega
+WITH PERIOD 2*pi:
+
+        X(e^(j*(omega + 2*pi))) = X(e^(j*omega))      for all omega
+
+This periodicity arises directly from the fact that exp(-j*omega*n)
+is itself periodic in omega with period 2*pi for every integer n
+(since exp(-j*(omega+2*pi)*n) = exp(-j*omega*n)*exp(-j*2*pi*n) =
+exp(-j*omega*n), because exp(-j*2*pi*n) = 1 for integer n). As a
+direct consequence, the synthesis (inverse DTFT) integral need only be
+evaluated over any single period of length 2*pi (commonly -pi to pi,
+or 0 to 2*pi); integrating beyond this range is redundant.
+
+EXISTENCE NOTE: The DTFT converges (in the ordinary sense) for any
+absolutely summable sequence (Sum of |x[n]| < infinity), and in the
+mean-square sense for any finite-energy (square-summable) sequence.
+
+-----------------------------------------------
+SECTION 3: CORE PROPERTIES OF THE FOURIER TRANSFORMS
+-----------------------------------------------
+
+Notation: x(t) <---> X(j*omega) denotes a CTFT pair.
+          x[n] <---> X(e^(j*omega)) denotes a DTFT pair.
+
+--- 3.1 LINEARITY ---
+
+CTFT:    a*x_1(t) + b*x_2(t)  <--->  a*X_1(j*omega) + b*X_2(j*omega)
+
+DTFT:    a*x_1[n] + b*x_2[n]  <--->  a*X_1(e^(j*omega)) + b*X_2(e^(j*omega))
+
+for arbitrary complex constants a, b.
+
+--- 3.2 TIME SHIFTING ---
+
+CTFT:    x(t - t_0)  <--->  exp(-j*omega*t_0) * X(j*omega)
+
+A time shift introduces a linear PHASE SHIFT in the frequency domain
+(of slope -t_0) while leaving the magnitude |X(j*omega)| unchanged,
+since |exp(-j*omega*t_0)| = 1.
+
+DTFT:    x[n - n_0]  <--->  exp(-j*omega*n_0) * X(e^(j*omega))
+
+Identical interpretation: only phase is modified, magnitude is
+preserved.
+
+--- 3.3 FREQUENCY SHIFTING (MODULATION) ---
+
+CTFT:    exp(j*omega_0*t) * x(t)  <--->  X(j*(omega - omega_0))
+
+DTFT:    exp(j*omega_0*n) * x[n]  <--->  X(e^(j*(omega - omega_0)))
+
+Multiplying a signal by a complex exponential in the time domain
+shifts (translates) its spectrum in the frequency domain. This is the
+mathematical basis of amplitude modulation (AM).
+
+--- 3.4 DUALITY (CTFT ONLY) ---
+
+The CTFT exhibits a symmetric duality between the time and frequency
+domains not shared (in the same form) by the DTFT, owing to the DTFT's
+inherent periodicity and the CTFT's pair of unbounded continuous
+domains. If:
+
+        x(t)  <--->  X(j*omega)
+
+then the DUALITY PROPERTY states:
+
+        X(j*t)  <--->  2*pi * x(-omega)
+
+That is, if a time function has the same form as a known transform
+X(j*omega), the transform of that time function can be found by
+substituting into the original x(t) (reversed and scaled by 2*pi).
+Example application: since rect(t) <---> 2*sinc(omega/2)-type pulse
+relationships, duality lets sinc-shaped time functions be transformed
+by inspection from known rectangular-pulse transform pairs.
+
+--- 3.5 DIFFERENTIATION IN TIME ---
+
+CTFT:    d/dt [x(t)]  <--->  (j*omega) * X(j*omega)
+
+This follows directly by differentiating both sides of the CTFT
+synthesis equation with respect to t under the integral sign.
+
+DTFT (DIFFERENCING, the DT analog of differentiation):
+        x[n] - x[n-1]  <--->  (1 - exp(-j*omega)) * X(e^(j*omega))
+
+(Note: true "differentiation in time" is not defined for discrete
+sequences; first-differencing is the standard DT analog and is
+included here for completeness. The DTFT also possesses a true dual
+property, "differentiation in frequency," given by:
+        n * x[n]  <--->  j * d/d(omega) [X(e^(j*omega))] )
+
+--- 3.6 CONVOLUTION PROPERTY ---
+
+This is one of the most important properties for LTI system analysis:
+convolution in the time domain corresponds to multiplication in the
+frequency domain.
+
+CTFT:
+        y(t) = x(t) * h(t)   <--->   Y(j*omega) = X(j*omega) * H(j*omega)
+
+where "*" on the left denotes time-domain convolution:
+        x(t) * h(t) = Integral from -infinity to infinity of
+                       x(tau) * h(t - tau) d(tau)
+and "*" on the right denotes ordinary multiplication of the two
+transforms.
+
+DTFT:
+        y[n] = x[n] * h[n]   <--->   Y(e^(j*omega)) = X(e^(j*omega)) * H(e^(j*omega))
+
+where the left-hand "*" denotes DT convolution:
+        x[n] * h[n] = Sum from k = -infinity to infinity of
+                       x[k] * h[n - k]
+
+This property is the foundation of LTI system frequency-response
+analysis: the output spectrum equals the input spectrum multiplied by
+the system's frequency response H(j*omega) or H(e^(j*omega)).
+
+A DUAL property also holds: multiplication in time corresponds to
+convolution (scaled by 1/(2*pi)) in frequency:
+
+CTFT:    x(t) * y(t) [pointwise product]  <--->
+              (1/(2*pi)) * [X(j*omega) * Y(j*omega)] (frequency convolution)
+
+DTFT:    x[n] * y[n] [pointwise product]  <--->
+              (1/(2*pi)) * Integral over one period of
+              X(e^(j*theta)) * Y(e^(j*(omega - theta))) d(theta)
+              (periodic convolution over any 2*pi interval)
+
+-----------------------------------------------
+SECTION 4: ESSENTIAL TRANSFORM PAIRS LOOKUP TABLE
+-----------------------------------------------
+
+--- 4.1 CONTINUOUS-TIME PAIRS ---
+
+(1) Unit Impulse:
+        delta(t)   <--->   1
+    (The impulse contains all frequencies with equal, unit magnitude.)
+
+(2) DC (Constant) Signal:
+        1   <--->   2*pi * delta(omega)
+    (A constant in time is concentrated entirely at omega = 0 in
+    frequency; this is the dual of pair (1), consistent with the
+    duality property in Section 3.4.)
+
+(3) Unit Step Function:
+        u(t)   <--->   1/(j*omega) + pi * delta(omega)
+    (The unit step is decomposed conceptually as a DC component, which
+    is why the delta(omega) term with weight pi appears, plus an
+    odd/transient-like component 1/(j*omega).)
+
+(4) Real (Causal) Exponential Decay:
+        exp(-a*t) * u(t)   <--->   1 / (a + j*omega)
+    VALID CONDITION: Real(a) > 0 (i.e., Re{a} > 0), required for the
+    defining integral to converge.
+
+-- ADDITIONAL STANDARD CTFT PAIRS --
+
+(5) Complex Exponential (single frequency):
+        exp(j*omega_0*t)   <--->   2*pi * delta(omega - omega_0)
+
+(6) Cosine:
+        cos(omega_0*t)   <--->   pi * [delta(omega - omega_0) + delta(omega + omega_0)]
+
+(7) Sine:
+        sin(omega_0*t)   <--->   (pi/j) * [delta(omega - omega_0) - delta(omega + omega_0)]
+                           equivalently:
+                           -j*pi * [delta(omega - omega_0) - delta(omega + omega_0)]
+
+(8) Signum function:
+        sgn(t)   <--->   2 / (j*omega)
+
+--- 4.2 DISCRETE-TIME PAIRS ---
+
+(1) Discrete Unit Impulse:
+        delta[n]   <--->   1
+
+(2) Discrete Unit Step:
+        u[n]   <--->   1 / (1 - exp(-j*omega)) +
+                        pi * Sum over k from -infinity to infinity of
+                             delta(omega - 2*pi*k)
+
+    NOTE ON STRUCTURE: as in the CT case, this pair decomposes into a
+    "non-impulsive" geometric-series-like term 1/(1 - exp(-j*omega))
+    plus an impulse train of weight pi, repeated at every integer
+    multiple of 2*pi (k = ..., -1, 0, 1, ...), which is REQUIRED so
+    that the overall expression respects the mandatory 2*pi-periodicity
+    of every DTFT (see Section 2). A single isolated impulse term
+    (without the summation over all k) would violate periodicity and
+    is therefore NOT a valid DTFT.
+
+-- ADDITIONAL STANDARD DTFT PAIRS --
+
+(3) Real Geometric Sequence (causal):
+        a^n * u[n]   <--->   1 / (1 - a*exp(-j*omega))
+    VALID CONDITION: |a| < 1, required for absolute summability and
+    convergence.
+
+(4) Complex Exponential (single frequency), periodic impulse train:
+        exp(j*omega_0*n)   <--->   2*pi * Sum over k of
+                                    delta(omega - omega_0 - 2*pi*k)
+
+(5) Constant (DC) Sequence:
+        1 (for all n)   <--->   2*pi * Sum over k of delta(omega - 2*pi*k)
+
+(6) Cosine Sequence:
+        cos(omega_0*n)  <--->  pi * Sum over k of
+              [delta(omega - omega_0 - 2*pi*k) + delta(omega + omega_0 - 2*pi*k)]
+
+=====================================================================
+END OF FILE: fourier_analysis.txt
+=====================================================================

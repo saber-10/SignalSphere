@@ -1,14 +1,19 @@
-from knowledge.vector_store import get_retriever
-from knowledge.bm25 import BM25Retriever
+from knowledge.retriever import Retriever
 
-_, metadata, _ = get_retriever()
+retriever = Retriever()
 
-bm25 = BM25Retriever(metadata)
+results = retriever.retrieve(
+    "What is Laplace Transform?"
+)
 
-results = bm25.retrieve("What is Laplace Transform?")
+for r in results:
 
-for i, chunk in enumerate(results, 1):
-    print(f"\nResult {i}")
-    print("Score:", chunk["score"])
-    print("Source:", chunk["source"])
-    print(chunk["text"][:200])
+    print(r["source"])
+
+    print(r["score"])
+
+    print(r["text"][:100])
+
+    print("-"*50)
+
+print(results[0])

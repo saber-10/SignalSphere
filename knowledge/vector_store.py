@@ -36,7 +36,7 @@ def _get_st():
 chunk_size = 900
 chunk_overlap = 150
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
-KB_DIR = Path(__file__).parent 
+KB_DIR = Path(__file__).parent / "text_documents"
 INDEX_PATH = Path(__file__).parent / "vector_store" / "index.faiss"
 
 def _split_large_text(text: str, chunk_size: int, overlap: int):

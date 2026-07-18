@@ -1,7 +1,9 @@
+
 from langgraph.graph import StateGraph, START, END
 
 from agents.states import AgentState
 from agents.parser import ParserAgent
+from agents.retriever import RetrieverAgent
 from agents.router import RouterAgent
 from agents.solver import SolverAgent
 from agents.verifier import VerifierAgent
@@ -22,6 +24,7 @@ def build_graph():
     builder = StateGraph(AgentState)
 
     parser = ParserAgent()
+    retriever = RetrieverAgent()
     router = RouterAgent()
     solver = SolverAgent()
     verifier = VerifierAgent()
@@ -33,7 +36,12 @@ def build_graph():
     builder.add_node(
     "parser",
     parser.parse,
-)
+    )
+
+    builder.add_node(
+        "retriever",
+        retriever.retrieve
+        )
 
     builder.add_node(
         "router",
@@ -43,6 +51,11 @@ def build_graph():
     builder.add_node(
         "solver",
         solver.solve,
+    )
+
+    builder.add_node(
+        "solver_math",
+        solver.solve
     )
 
     builder.add_node(
@@ -56,14 +69,19 @@ def build_graph():
 )
 
     builder.add_edge(
-        "parser",
-        "router",
+    "parser",
+    "retriever",
     )
 
     builder.add_edge(
+    "retriever",
+    "router",
+)
+
+    builder.add_conditional_edges(
         "router",
-        "solver",
-    )
+        route_after_router,
+    )  
 
     builder.add_edge(
         "solver",
@@ -79,6 +97,13 @@ def build_graph():
 
 _GRAPH = None
 
+def route_after_router(state: AgentState) -> str:
+    strategy = state["strategy"]
+    if strategy == "solver":
+        return "solver"
+    elif strategy == "solver_math":
+        return "solver_math"
+    return "solver"
 
 def get_graph():
 

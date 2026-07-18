@@ -5,11 +5,12 @@ from knowledge.vector_store import get_retriever
 from config import Config
 from langchain_ollama import ChatOllama
 from knowledge.vector_store import retrieve
+from knowledge.retriever import Retriever
 
 
 class SolverAgent:
     def __init__(self):
-        self.index, self.metadata, self.embedding_model = get_retriever()
+        self.retriever = Retriever()
         self.llm = ChatOllama(
     model="qwen3:8b",
     temperature=0.2,
@@ -18,30 +19,20 @@ class SolverAgent:
     def solve(self, state: AgentState) -> AgentState:
         try:
             question = state["question"]
+            context = state["context"]
 
-            retrieved_chunks = retrieve(
-                query = question, 
-                index = self.index,
-                model = self.embedding_model,
-                metadata = self.metadata,
-                top_k = 5
-            )
-
-            context = ""
-
-            for chunk in retrieved_chunks:
-                context += (
-                    f"Source: {chunk['source']}\n"
-                    f"{chunk['text']}\n\n"
-                )
 
             messages = create_solver_prompt(context = context, question = question)
 
             answer = self.llm.invoke(messages)
 
-            state["retrieved_chunks"] = retrieved_chunks
-            state["context"] = context
+            
             state["answer"] = answer.content
+
+            self.setdefault("agent_trace", []).append({
+                "agent": "SolverAgent",
+                "status": "completed"
+            })
 
             return state
         

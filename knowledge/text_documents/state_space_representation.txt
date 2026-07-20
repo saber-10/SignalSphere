@@ -1,0 +1,244 @@
+=====================================================================
+FILE: state_space_representation.txt
+TOPIC: State-Space Representation of LTI Systems
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: MOTIVATION AND THE CONCEPT OF STATE
+-----------------------------------------------
+
+LIMITATION OF THE INPUT-OUTPUT (TRANSFER FUNCTION) VIEWPOINT:
+The transfer function descriptions H(s) and H(z) (see
+laplace_transform.txt and z_transform.txt) characterize only the
+EXTERNAL input-output relationship of a system and implicitly assume
+ZERO INITIAL CONDITIONS (or equivalently, describe only the
+zero-state response). They do not, by themselves, describe the
+system's INTERNAL configuration, nor do they directly handle nonzero
+initial energy storage (e.g., a charged capacitor or a moving mass at
+t=0).
+
+DEFINITION (State):
+The STATE of a system at time t_0 is the minimal set of quantities
+(the STATE VARIABLES) which, together with the input for all t >= t_0,
+is sufficient to determine the output for all t >= t_0. Equivalently,
+the state summarizes the entire relevant effect of the past (t < t_0)
+on the future (t >= t_0) — the system need not "remember" anything
+about the input prior to t_0 beyond what is captured in the state
+vector at t_0.
+
+STATE VECTOR:
+For a system with N independent state variables, the state at time t
+(or n) is collected into an N x 1 STATE VECTOR, conventionally denoted
+q(t) (CT) or q[n] (DT):
+
+        q(t) = [q_1(t), q_2(t), ..., q_N(t)]^T
+        q[n] = [q_1[n], q_2[n], ..., q_N[n]]^T
+
+The integer N (the number of independent state variables) is called
+the ORDER of the system, and equals the order of the corresponding
+linear constant-coefficient differential/difference equation, or,
+equivalently, the number of poles of a corresponding rational transfer
+function (assuming no pole-zero cancellation).
+
+-----------------------------------------------
+SECTION 2: THE STANDARD STATE-SPACE EQUATIONS
+-----------------------------------------------
+
+--- 2.1 CONTINUOUS-TIME (CT) STATE-SPACE FORM ---
+
+A CT LTI system with state vector q(t) (N x 1), input x(t) (assumed
+here a scalar for simplicity, generalizing directly to a vector input
+of dimension M), and output y(t) (scalar, generalizing to dimension P)
+is described by the pair of matrix equations:
+
+        STATE (DYNAMIC) EQUATION:
+        d/dt q(t) = A * q(t) + B * x(t)
+
+        OUTPUT (MEASUREMENT) EQUATION:
+        y(t) = C * q(t) + D * x(t)
+
+where:
+   A  is the N x N SYSTEM (STATE) MATRIX, governing the unforced,
+      internal dynamics of the state.
+   B  is the N x 1 INPUT MATRIX, describing how the input drives each
+      state variable.
+   C  is the 1 x N OUTPUT MATRIX, describing how the output is formed
+      as a linear combination of the state variables.
+   D  is the 1 x 1 FEEDTHROUGH (or DIRECT TRANSMISSION) TERM, describing
+      any direct (memoryless) path from input to output that bypasses
+      the state entirely (D = 0 for a strictly proper system).
+
+The state equation is a FIRST-ORDER (vector) linear differential
+equation; this is precisely the benefit of the state-space
+formulation — an N-th order scalar differential equation is replaced
+by N coupled FIRST-order equations, which is the natural form for
+numerical (computer) simulation and for many analytical/control
+techniques.
+
+--- 2.2 DISCRETE-TIME (DT) STATE-SPACE FORM ---
+
+        STATE (UPDATE) EQUATION:
+        q[n + 1] = A * q[n] + B * x[n]
+
+        OUTPUT EQUATION:
+        y[n] = C * q[n] + D * x[n]
+
+with A, B, C, D playing analogous roles to the CT case (A is now the
+N x N matrix governing the RECURSIVE update of the state from one time
+step to the next).
+
+-----------------------------------------------
+SECTION 3: SOLUTION OF THE STATE EQUATIONS
+-----------------------------------------------
+
+--- 3.1 DT SOLUTION (CLOSED FORM BY DIRECT RECURSION) ---
+
+Iterating the DT state equation forward from an initial state q[n_0]
+gives the explicit closed-form solution:
+
+        q[n] = A^(n - n_0) * q[n_0] + Sum from m = n_0 to n-1 of
+               A^(n - 1 - m) * B * x[m]
+
+The first term, A^(n-n_0)*q[n_0], is the ZERO-INPUT RESPONSE (state
+evolution due to initial conditions alone, with x[n] = 0 for
+n >= n_0); the second (summation) term is the ZERO-STATE RESPONSE
+(state evolution due to the input alone, with q[n_0] = 0). This is a
+direct instance of the LINEARITY of the state equation: the total
+response is the sum of the zero-input and zero-state responses.
+
+--- 3.2 CT SOLUTION (MATRIX EXPONENTIAL) ---
+
+Analogous to the DT case, the CT state equation has closed-form
+solution:
+
+        q(t) = exp(A*(t - t_0)) * q(t_0) +
+               Integral from t_0 to t of
+               exp(A*(t - tau)) * B * x(tau) d(tau)
+
+where exp(A*t) is the MATRIX EXPONENTIAL, defined by the convergent
+power series (directly analogous to the scalar exponential Taylor
+series):
+
+        exp(A*t) = I + A*t + (A*t)^2/2! + (A*t)^3/3! + ...
+                 = Sum from k=0 to infinity of (A^k * t^k) / k!
+
+The matrix exp(A*t) is also called the STATE TRANSITION MATRIX; it
+satisfies exp(A*0) = I (the identity matrix) and
+d/dt[exp(A*t)] = A*exp(A*t).
+
+-----------------------------------------------
+SECTION 4: TRANSFER FUNCTION FROM STATE-SPACE
+-----------------------------------------------
+
+--- 4.1 CT CASE ---
+
+Taking the (unilateral) Laplace transform of the state and output
+equations, assuming zero initial state q(0-) = 0 (to extract the
+zero-state, transfer-function relationship):
+
+        s*Q(s) = A*Q(s) + B*X(s)   =>   Q(s) = (s*I - A)^(-1) * B * X(s)
+        Y(s)   = C*Q(s) + D*X(s)
+
+Substituting the first equation into the second gives the transfer
+function:
+
+        H(s) = Y(s)/X(s) = C * (s*I - A)^(-1) * B + D
+
+--- 4.2 DT CASE ---
+
+Taking the (unilateral) z-transform of the state and output equations,
+assuming zero initial state q[0] = 0:
+
+        z*Q(z) = A*Q(z) + B*X(z)   =>   Q(z) = (z*I - A)^(-1) * B * X(z)
+        Y(z)   = C*Q(z) + D*X(z)
+
+        H(z) = Y(z)/X(z) = C * (z*I - A)^(-1) * B + D
+
+--- 4.3 POLES OF H(s) OR H(z) AND EIGENVALUES OF A ---
+
+Since (s*I - A)^(-1) = adj(s*I - A) / det(s*I - A), the denominator of
+H(s) is (up to pole-zero cancellations that may occur in forming
+C*(...)^(-1)*B) the CHARACTERISTIC POLYNOMIAL of A:
+
+        det(s*I - A) = 0
+
+whose roots are, by definition, the EIGENVALUES of A. Consequently,
+the POLES of H(s) (or H(z), using det(z*I - A) = 0) are, in the
+absence of pole-zero cancellation, exactly the EIGENVALUES of the
+system matrix A. This is the state-space counterpart of the
+transfer-function stability criteria in laplace_transform.txt (Section
+4) and z_transform.txt (Section 3): a state-space realization is BIBO
+stable (assuming no pole-zero cancellation hides an unstable mode)
+if and only if every eigenvalue of A has negative real part (CT case)
+or magnitude strictly less than 1 (DT case).
+
+-----------------------------------------------
+SECTION 5: NON-UNIQUENESS OF STATE-SPACE REALIZATIONS
+-----------------------------------------------
+
+SIMILARITY TRANSFORMATION:
+Given any state-space realization (A, B, C, D) and any invertible N x N
+matrix T, defining a new state vector q_tilde(t) = T * q(t) (a linear
+change of basis) yields an EQUIVALENT realization:
+
+        A_tilde = T * A * T^(-1)
+        B_tilde = T * B
+        C_tilde = C * T^(-1)
+        D_tilde = D
+
+which produces EXACTLY the same input-output transfer function
+H(s) (or H(z)):
+
+        C_tilde * (s*I - A_tilde)^(-1) * B_tilde + D_tilde  =
+              C * (s*I - A)^(-1) * B + D   =   H(s)
+
+(this follows because eigenvalues, hence the characteristic
+polynomial and hence the poles, are invariant under similarity
+transformation: det(s*I - T*A*T^(-1)) = det(s*I - A)). This
+demonstrates that the state-space representation of a given transfer
+function is NOT unique — infinitely many (A,B,C,D) quadruples,
+related by similarity transformations, realize the same external
+input-output behavior, in direct analogy to how a single X(s) can
+correspond to different ROCs describing different x(t) in the Laplace
+transform (though the mechanism of non-uniqueness is different in each
+case).
+
+-----------------------------------------------
+SECTION 6: CONTROLLABILITY AND OBSERVABILITY (BRIEF)
+-----------------------------------------------
+
+CONTROLLABILITY:
+A state-space system (A, B) is (completely state) CONTROLLABLE if
+there exists some finite-duration input capable of driving the state
+from ANY initial state to ANY desired final state in finite time. A
+standard rank test (CT or DT, identical form) is that the system is
+controllable if and only if the N x N CONTROLLABILITY MATRIX
+
+        Wc = [ B, A*B, A^2*B, ..., A^(N-1)*B ]
+
+has full rank N.
+
+OBSERVABILITY:
+A state-space system (A, C) is (completely) OBSERVABLE if the initial
+state q(t_0) (or q[n_0]) can be uniquely determined from knowledge of
+the output y(t) (or y[n]) and input x(t) (or x[n]) over some finite
+subsequent time interval. A standard rank test is that the system is
+observable if and only if the N x N OBSERVABILITY MATRIX
+
+        Wo = [ C; C*A; C*A^2; ...; C*A^(N-1) ]     (stacked rows)
+
+has full rank N.
+
+RELEVANCE TO POLE-ZERO CANCELLATION:
+If a state-space realization is NOT both controllable and observable,
+the transfer function H(s) = C*(sI-A)^(-1)*B + D computed from it will
+exhibit POLE-ZERO CANCELLATION relative to the full set of eigenvalues
+of A: uncontrollable or unobservable eigenvalues (MODES) of A do not
+appear as poles of the external input-output transfer function, even
+though they remain present internally and can still affect internal
+signals or stability in ways not visible from the input-output
+description alone.
+
+=====================================================================
+END OF FILE: state_space_representation.txt
+=====================================================================

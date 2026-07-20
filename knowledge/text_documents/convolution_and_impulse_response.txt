@@ -1,0 +1,245 @@
+=====================================================================
+FILE: convolution_and_impulse_response.txt
+TOPIC: Convolution, Impulse Response, and LTI System Interconnection
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: THE IMPULSE RESPONSE AND THE SIFTING PROPERTY
+-----------------------------------------------
+
+DEFINITION (Impulse Response):
+The IMPULSE RESPONSE of a system H is the output produced when the
+input is the unit impulse:
+
+        h(t) = H{delta(t)}          (CT case)
+        h[n] = H{delta[n]}          (DT case)
+
+SIFTING PROPERTY (CT):
+Any CT signal x(t) can be represented exactly as a (continuous) linear
+combination of time-shifted, scaled impulses:
+
+        x(t) = Integral from -infinity to infinity of
+               x(tau) * delta(t - tau) d(tau)
+
+This is the SIFTING (or SAMPLING) PROPERTY of the impulse: convolving
+any function with delta(t) reproduces that function unchanged, and
+more generally x(tau)*delta(t-tau), integrated over tau, "sifts out"
+the single value x(tau) at each shift.
+
+DECOMPOSITION PROPERTY (DT):
+Any DT signal x[n] can be represented exactly as a (discrete) linear
+combination of time-shifted, scaled discrete impulses:
+
+        x[n] = Sum from k = -infinity to infinity of
+               x[k] * delta[n - k]
+
+This DT identity is exact (not merely a limiting/generalized
+statement, unlike the CT sifting property, since delta[n] is an
+ordinary, finite-valued sequence rather than a generalized function).
+
+DERIVATION OF THE CONVOLUTION SUM/INTEGRAL:
+For an LTI system H, applying superposition (linearity) to the
+decomposition above, together with time-invariance to relate the
+response to delta[n-k] back to the response to delta[n], yields:
+
+CT:     y(t) = H{x(t)} = H{ Integral of x(tau)*delta(t-tau) d(tau) }
+             = Integral of x(tau) * H{delta(t-tau)} d(tau)   [linearity]
+             = Integral of x(tau) * h(t-tau) d(tau)          [time-invariance]
+             = x(t) * h(t)                                    [definition]
+
+DT:     y[n] = H{x[n]} = Sum_k x[k] * H{delta[n-k]}           [linearity]
+             = Sum_k x[k] * h[n-k]                             [time-invariance]
+             = x[n] * h[n]                                     [definition]
+
+This is the central result of LTI systems theory: an LTI system's
+ENTIRE input-output behavior is completely and uniquely characterized
+by its impulse response h(t) or h[n], via the convolution operation.
+
+-----------------------------------------------
+SECTION 2: PROPERTIES OF CONVOLUTION
+-----------------------------------------------
+
+--- 2.1 COMMUTATIVITY ---
+
+        x(t) * h(t) = h(t) * x(t)
+        x[n] * h[n] = h[n] * x[n]
+
+PROOF SKETCH (CT): substituting sigma = t - tau in the defining
+integral, so that tau = t - sigma and d(tau) = -d(sigma), and
+reversing the (now-flipped) limits of integration, transforms
+Integral of x(tau)*h(t-tau)d(tau) exactly into Integral of
+h(sigma)*x(t-sigma)d(sigma).
+
+PRACTICAL CONSEQUENCE: for a series interconnection of two LTI
+systems, the OVERALL impulse response does not depend on the ORDER in
+which the two subsystems are connected (see Section 4.1).
+
+--- 2.2 ASSOCIATIVITY ---
+
+        [x(t) * h_1(t)] * h_2(t) = x(t) * [h_1(t) * h_2(t)]
+        [x[n] * h_1[n]] * h_2[n] = x[n] * [h_1[n] * h_2[n]]
+
+PRACTICAL CONSEQUENCE: a cascade (series) connection of two LTI
+systems with impulse responses h_1 and h_2 is EQUIVALENT to a single
+LTI system whose impulse response is h_1(t) * h_2(t) (or h_1[n]*h_2[n]
+in DT) — see Section 4.1.
+
+--- 2.3 DISTRIBUTIVITY OVER ADDITION ---
+
+        x(t) * [h_1(t) + h_2(t)] = x(t)*h_1(t) + x(t)*h_2(t)
+        x[n] * [h_1[n] + h_2[n]] = x[n]*h_1[n] + x[n]*h_2[n]
+
+PRACTICAL CONSEQUENCE: a PARALLEL connection of two LTI systems with
+impulse responses h_1 and h_2 is EQUIVALENT to a single LTI system
+whose impulse response is h_1(t) + h_2(t) (or h_1[n]+h_2[n]) — see
+Section 4.2.
+
+--- 2.4 IDENTITY (CONVOLUTION WITH THE IMPULSE) ---
+
+        x(t) * delta(t) = x(t)                (immediate consequence
+        x[n] * delta[n] = x[n]                 of the sifting property)
+
+        x(t) * delta(t - t_0) = x(t - t_0)
+        x[n] * delta[n - n_0] = x[n - n_0]
+(Convolution with a SHIFTED impulse produces a correspondingly shifted
+copy of the original signal; this identifies the impulse as the
+convolutional identity element, and a shifted impulse as a pure delay
+element.)
+
+--- 2.5 WIDTH / DURATION PROPERTY (FINITE-DURATION SIGNALS) ---
+
+If x(t) is nonzero only on [T_x1, T_x2] and h(t) is nonzero only on
+[T_h1, T_h2], then y(t) = x(t)*h(t) is nonzero only on:
+
+        [T_x1 + T_h1, T_x2 + T_h2]
+
+(the convolution's support is the sum of the two supports). The
+identical rule holds in DT with sample indices in place of times: if
+x[n] is nonzero on [N_x1,N_x2] and h[n] on [N_h1,N_h2], then y[n] is
+nonzero only on [N_x1+N_h1, N_x2+N_h2].
+
+--- 2.6 DIFFERENTIATION/DIFFERENCING PROPERTY (CT/DT) ---
+
+CT:     d/dt[x(t)*h(t)] = [d/dt x(t)] * h(t) = x(t) * [d/dt h(t)]
+
+DT (first-difference analog):
+        (x[n]*h[n]) - (x[n-1]*h[n-1]) = (x[n]-x[n-1]) * h[n]
+                                       = x[n] * (h[n]-h[n-1])
+
+-----------------------------------------------
+SECTION 3: GRAPHICAL / MECHANICAL EVALUATION OF CONVOLUTION
+-----------------------------------------------
+
+STANDARD PROCEDURE FOR y(t) = x(t) * h(t) (identical logic in DT):
+
+STEP 1 — FLIP: Reflect one of the two signals about the vertical axis
+to obtain h(-tau) (as a function of the dummy variable tau).
+
+STEP 2 — SHIFT: Shift the flipped signal by t to obtain h(t - tau);
+positive t shifts the flipped signal to the right.
+
+STEP 3 — MULTIPLY: Form the pointwise product x(tau) * h(t - tau) as
+a function of tau, for the current fixed value of t.
+
+STEP 4 — INTEGRATE (or SUM in DT): Integrate (CT) or sum (DT) the
+product over all tau (or k) to obtain the single output value y(t) (or
+y[n]) corresponding to that particular shift t.
+
+STEP 5 — REPEAT: Slide t (or n) continuously (CT) or through all
+integers (DT), repeating Steps 3-4 at each position, to trace out the
+complete output signal y(t) (or y[n]). In practice, the range of
+integration is broken into intervals ("cases") of t over which the
+overlap between x(tau) and h(t-tau) has a fixed, describable form
+(e.g., a growing overlap, then a constant full overlap, then a
+shrinking overlap), and a separate closed-form expression for y(t) is
+derived for each such interval.
+
+DISCRETE-TIME TABULAR (SLIDING-WINDOW) METHOD:
+For finite-length sequences, x[n]*h[n] can equivalently be computed by
+writing one sequence in a fixed row, writing the time-reversed other
+sequence beneath it, sliding the bottom row one sample at a time,
+multiplying aligned entries, and summing each diagonal of products —
+mechanically identical to long multiplication of two polynomials whose
+coefficients are the sequence values (convolution of two sequences of
+length L_1 and L_2 has a natural polynomial-multiplication
+interpretation and produces a result of length L_1 + L_2 - 1).
+
+-----------------------------------------------
+SECTION 4: INTERCONNECTION OF LTI SYSTEMS
+-----------------------------------------------
+
+--- 4.1 SERIES (CASCADE) CONNECTION ---
+
+Two LTI systems with impulse responses h_1(t) and h_2(t), connected so
+the output of the first feeds the input of the second, are equivalent
+to a single LTI system with overall impulse response:
+
+        h(t) = h_1(t) * h_2(t)
+
+By commutativity of convolution (Section 2.1), the order of cascaded
+LTI systems does NOT affect the overall impulse response (this is
+generally FALSE for non-LTI or time-varying systems). In the transform
+domain this becomes ordinary multiplication:
+
+        H(s) = H_1(s) * H_2(s)      [Laplace, algebraic product]
+        H(z) = H_1(z) * H_2(z)      [z-transform, algebraic product]
+
+--- 4.2 PARALLEL CONNECTION ---
+
+Two LTI systems with impulse responses h_1(t) and h_2(t), connected so
+both receive the same input and their outputs are summed, are
+equivalent to a single LTI system with overall impulse response:
+
+        h(t) = h_1(t) + h_2(t)
+
+In the transform domain:
+        H(s) = H_1(s) + H_2(s)
+        H(z) = H_1(z) + H_2(z)
+
+--- 4.3 NEGATIVE FEEDBACK CONNECTION ---
+
+For a forward path H_1(s) and a feedback path H_2(s), with the
+feedback signal subtracted from the external input before entering
+H_1 (standard negative-feedback configuration), the overall (closed-
+loop) transfer function is:
+
+        H(s) = H_1(s) / [1 + H_1(s) * H_2(s)]
+
+(Analogously in z: H(z) = H_1(z) / [1 + H_1(z)*H_2(z)].) The term
+1 + H_1(s)*H_2(s) is often called the RETURN DIFFERENCE, and
+H_1(s)*H_2(s) is the LOOP TRANSFER FUNCTION or LOOP GAIN. Feedback
+interconnections can move pole locations relative to the open-loop
+system, which is the basic mechanism by which feedback control can
+stabilize an otherwise-unstable open-loop system, or destabilize an
+otherwise-stable one, depending on parameter values.
+
+-----------------------------------------------
+SECTION 5: CONVOLUTION WITH SINGULARITY FUNCTIONS
+-----------------------------------------------
+
+CONVOLUTION WITH THE UNIT STEP (RUNNING INTEGRAL / RUNNING SUM):
+
+        x(t) * u(t) = Integral from -infinity to t of x(tau) d(tau)
+
+        x[n] * u[n] = Sum from k = -infinity to n of x[k]
+
+Consequently, if a system's impulse response is itself the unit step,
+h(t) = u(t), that system is a pure (CT) INTEGRATOR, and h[n] = u[n]
+characterizes a pure (DT) ACCUMULATOR — the DT system defined by
+y[n] = Sum_{k<=n} x[k].
+
+DERIVATIVE/DIFFERENCE AS AN INVERSE OPERATION:
+Since integration and differentiation are inverse operations, and
+convolution with u(t) implements integration, it follows that the
+system with impulse response d/dt[delta(t)] (the doublet, the
+generalized derivative of the impulse) implements differentiation:
+
+        x(t) * [d/dt delta(t)] = d/dt [x(t)]
+
+The exact DT analog uses the first difference of delta[n]:
+
+        x[n] * [delta[n] - delta[n-1]] = x[n] - x[n-1]
+
+=====================================================================
+END OF FILE: convolution_and_impulse_response.txt
+=====================================================================

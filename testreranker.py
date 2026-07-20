@@ -8,6 +8,7 @@ chunks = retriever.retrieve(
     "What is Laplace Transform?"
 )
 
+
 results = reranker.rerank(
     "What is Laplace Transform?",
     chunks,
@@ -22,3 +23,4 @@ for chunk in results:
     print("Score:", chunk["reranker_score"])
     print("Source:", chunk["source"])
     print(chunk["text"][:200])
+

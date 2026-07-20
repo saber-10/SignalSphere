@@ -1,0 +1,15 @@
+[
+    {
+        "question": "Evaluate the convolution sum y[n] = x[n] * h[n] for x[n] = delta[n] and h[n] = (0.5)^n u[n].",
+        "expected": [
+            "signals_and_systems_basics"
+        ],
+        "retrieved": [
+            "convolution_and_impulse_response",
+            "fourier_analysis",
+            "convolution_and_impulse_response",
+            "discrete_fourier_transform_dft",
+            "convolution_and_impulse_response"
+        ]
+    }
+]

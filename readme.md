@@ -170,7 +170,7 @@ class Config:
 
 ---
 
-## future_improvments
+## Roadmap
 
 - [ ] Symbolic math solver agent for closed-form derivations
 - [ ] OCR support for handwritten notes and problem sets

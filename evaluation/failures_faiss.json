@@ -1,0 +1,28 @@
+[
+    {
+        "question": "Compare the convolution property of the continuous-time Fourier transform versus the discrete-time Fourier transform.",
+        "expected": [
+            "fourier_analysis"
+        ],
+        "retrieved": [
+            "discrete_fourier_transform_dft",
+            "convolution_and_impulse_response",
+            "discrete_fourier_transform_dft",
+            "convolution_and_impulse_response",
+            "discrete_fourier_transform_dft"
+        ]
+    },
+    {
+        "question": "Evaluate the convolution sum y[n] = x[n] * h[n] for x[n] = delta[n] and h[n] = (0.5)^n u[n].",
+        "expected": [
+            "signals_and_systems_basics"
+        ],
+        "retrieved": [
+            "convolution_and_impulse_response",
+            "sampling_and_nyquist",
+            "convolution_and_impulse_response",
+            "convolution_and_impulse_response",
+            "discrete_fourier_transform_dft"
+        ]
+    }
+]

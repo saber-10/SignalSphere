@@ -26,3 +26,7 @@ knowledge/vector_store/
 
 # Logs
 *.log
+knowledge/vector_store/index.faiss
+knowledge/vector_store/metadata.pkl
+__pycache__/
+*.pyc

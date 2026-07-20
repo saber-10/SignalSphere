@@ -1,0 +1,15 @@
+[
+    {
+        "question": "What is convolution and how does it relate the impulse response of an LTI system to its output?",
+        "expected": [
+            "signals_and_systems_basics"
+        ],
+        "retrieved": [
+            "convolution_and_impulse_response",
+            "convolution_and_impulse_response",
+            "convolution_and_impulse_response",
+            "convolution_and_impulse_response",
+            "laplace_transform"
+        ]
+    }
+]

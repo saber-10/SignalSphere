@@ -1,0 +1,66 @@
+{
+  "schema_note": "expected_topics and expected_documents are lists because parser.py's detect_topics() returns a list and some questions legitimately span 2 topics/files. For single-topic questions the list has one element.",
+
+  "eval_set": [
+    { "id": 1, "question": "What is the Laplace transform and why is a region of convergence required to uniquely define it?", "expected_topics": ["laplace_transform"], "expected_documents": ["laplace_transform.txt"], "problem_type": "concept" },
+    { "id": 2, "question": "Calculate the Laplace transform of x(t) = e^{-2t}u(t) and state its region of convergence.", "expected_topics": ["laplace_transform"], "expected_documents": ["laplace_transform.txt"], "problem_type": "numerical" },
+    { "id": 3, "question": "Derive the Laplace transform pair for a real causal exponential function from the bilateral definition.", "expected_topics": ["laplace_transform"], "expected_documents": ["laplace_transform.txt"], "problem_type": "derivation" },
+    { "id": 4, "question": "Discuss the application of the unilateral Laplace transform in solving circuit differential equations with nonzero initial conditions.", "expected_topics": ["laplace_transform"], "expected_documents": ["laplace_transform.txt"], "problem_type": "application" },
+    { "id": 5, "question": "Compare the causality condition of a rational transfer function in the Laplace transform versus the Z-transform.", "expected_topics": ["laplace_transform", "z_transform"], "expected_documents": ["laplace_transform.txt", "z_transform.txt"], "problem_type": "comparison" },
+
+    { "id": 6, "question": "Explain why the discrete-time Fourier transform is always periodic with period 2*pi.", "expected_topics": ["fourier_transform"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "concept", "note": "Uses hyphenated 'discrete-time' deliberately so the 'signals' topic (keyword 'discrete time' with a space) is NOT triggered." },
+    { "id": 7, "question": "Compute the continuous-time Fourier transform of x(t) = e^{-3t}u(t).", "expected_topics": ["fourier_transform"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "numerical" },
+    { "id": 8, "question": "Derive the duality property of the continuous-time Fourier transform starting from the analysis and synthesis equations.", "expected_topics": ["fourier_transform"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "derivation" },
+    { "id": 9, "question": "Discuss the application of the frequency-shifting property of the Fourier transform in amplitude modulation.", "expected_topics": ["fourier_transform"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "application" },
+    { "id": 10, "question": "Compare the convolution property of the continuous-time Fourier transform versus the discrete-time Fourier transform.", "expected_topics": ["fourier_transform", "convolution"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "comparison" },
+
+    { "id": 11, "question": "What is convolution and how does it relate the impulse response of an LTI system to its output?", "expected_topics": ["convolution", "lti_systems"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "concept" },
+    { "id": 12, "question": "Evaluate the convolution sum y[n] = x[n] * h[n] for x[n] = delta[n] and h[n] = (0.5)^n u[n].", "expected_topics": ["convolution"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "numerical" },
+    { "id": 13, "question": "Derive the frequency-domain convolution property showing that pointwise multiplication in time corresponds to convolution in frequency.", "expected_topics": ["convolution"], "expected_documents": ["fourier_analysis.txt"], "problem_type": "derivation", "note": "Topic tag alone is 'convolution', but the correct source is fourier_analysis.txt Section 3.6, not signals_and_systems_basics.txt. Tests whether retrieval works beyond just the topic label." },
+
+    { "id": 14, "question": "Explain the Nyquist sampling theorem and why the sampling frequency must exceed twice the maximum frequency component.", "expected_topics": ["sampling"], "expected_documents": ["sampling_and_nyquist.txt"], "problem_type": "concept" },
+    { "id": 15, "question": "Compute the minimum sampling frequency required to avoid aliasing for a waveform band-limited to 5 kHz.", "expected_topics": ["sampling"], "expected_documents": ["sampling_and_nyquist.txt"], "problem_type": "numerical" },
+    { "id": 16, "question": "Derive the spectrum of a sampled waveform using impulse-train sampling, starting from the multiplication of a continuous-time waveform with a periodic impulse train.", "expected_topics": ["sampling"], "expected_documents": ["sampling_and_nyquist.txt"], "problem_type": "derivation" },
+    { "id": 17, "question": "Discuss the application of anti-aliasing filters before sampling in practical analog-to-digital conversion systems.", "expected_topics": ["sampling"], "expected_documents": ["sampling_and_nyquist.txt"], "problem_type": "application" },
+
+    { "id": 18, "question": "What is the region of convergence of the Z-transform and why must it be specified together with X(z)?", "expected_topics": ["z_transform"], "expected_documents": ["z_transform.txt"], "problem_type": "concept" },
+    { "id": 19, "question": "Find the Z-transform of x[n] = (0.5)^n u[n] and specify its region of convergence.", "expected_topics": ["z_transform"], "expected_documents": ["z_transform.txt"], "problem_type": "numerical" },
+    { "id": 20, "question": "Derive the region of convergence rule for a right-sided sequence in the Z-transform.", "expected_topics": ["z_transform"], "expected_documents": ["z_transform.txt"], "problem_type": "derivation" },
+    { "id": 21, "question": "Compare the BIBO stability condition for a causal system using the Z-transform versus the Laplace transform.", "expected_topics": ["z_transform", "laplace_transform"], "expected_documents": ["z_transform.txt", "laplace_transform.txt"], "problem_type": "comparison" },
+
+    { "id": 22, "question": "Define linear time invariant systems and explain the two defining properties of linearity and time invariance.", "expected_topics": ["lti_systems"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "concept" },
+    { "id": 23, "question": "Prove that a causal LTI system's impulse response must be zero for negative time indices.", "expected_topics": ["lti_systems"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "derivation" },
+    { "id": 24, "question": "Evaluate whether an LTI system with impulse response h(t) = e^{-2t}u(t) is BIBO stable using the absolute integrability condition.", "expected_topics": ["lti_systems"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "numerical" },
+    { "id": 25, "question": "Discuss the application of the BIBO stability condition in verifying the practical usability of an LTI system's impulse response.", "expected_topics": ["lti_systems"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "application" },
+
+    { "id": 26, "question": "What is the difference between a continuous-time signal and a discrete-time signal?", "expected_topics": ["signals"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "comparison", "note": "Ideal label is 'comparison'. Current parser.py will likely output 'concept' (triggered by 'what') because 'difference between' is a two-word phrase and can't match via word-level split. Expect this to fail — that's a real bug, not a bad test case." },
+    { "id": 27, "question": "Calculate the average power of a periodic continuous-time signal given its energy over one fundamental period.", "expected_topics": ["signals"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "numerical" },
+    { "id": 28, "question": "Derive the even and odd decomposition formulas for an arbitrary continuous-time signal.", "expected_topics": ["signals"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "derivation" },
+    { "id": 29, "question": "Discuss the application of energy and power signal classification in characterizing real physical waveforms.", "expected_topics": ["signals"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "application" },
+    { "id": 30, "question": "Compare the definitions of an energy signal versus a power signal using their respective infinite-time integrals.", "expected_topics": ["signals"], "expected_documents": ["signals_and_systems_basics.txt"], "problem_type": "comparison" }
+  ],
+
+  "regression_tests_known_bugs": [
+    {
+      "id": "R1",
+      "question": "What is the difference between the DTFT and the DFT?",
+      "ideal_problem_type": "comparison",
+      "current_code_likely_output": "concept",
+      "bug": "COMPARISON_KEYWORDS contains the two-word phrase 'difference between', but detect_problem_type() splits the question into single words before checking set membership, so it can never match. 'what' (a CONCEPT keyword) matches instead."
+    },
+    {
+      "id": "R2",
+      "question": "Discuss the real world relevance of the sampling theorem in analog-to-digital conversion.",
+      "ideal_problem_type": "application",
+      "current_code_likely_output": "unknown",
+      "bug": "Same root cause: APPLICATION_KEYWORDS contains the two-word phrase 'real world', which can never match a single split word. No other keyword fires, so this returns ProblemType.UNKNOWN with confidence 0."
+    },
+    {
+      "id": "R3",
+      "question": "For x[n] = delta[n], how would you evaluate?",
+      "ideal_problem_type": "numerical",
+      "current_code_likely_output": "unknown",
+      "bug": "question.split() does not strip punctuation. The trigger word 'evaluate' is immediately followed by '?' with no space, producing the token 'evaluate?', which fails exact-match lookup against 'evaluate' in NUMERICAL_KEYWORDS."
+    }
+  ]
+}

@@ -29,7 +29,7 @@ class SolverAgent:
             
             state["answer"] = answer.content
 
-            self.setdefault("agent_trace", []).append({
+            state.setdefault("agent_trace", []).append({
                 "agent": "SolverAgent",
                 "status": "completed"
             })

@@ -1,0 +1,257 @@
+=====================================================================
+FILE: fourier_series.txt
+TOPIC: Continuous-Time and Discrete-Time Fourier Series
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: CONTINUOUS-TIME FOURIER SERIES (CTFS)
+-----------------------------------------------
+
+SETUP:
+The CTFS applies only to PERIODIC continuous-time signals. Let x(t) be
+periodic with fundamental period T and fundamental angular frequency:
+
+        omega_0 = 2*pi / T
+
+SYNTHESIS EQUATION (Forward direction — building x(t) from coefficients):
+Provided x(t) satisfies the Dirichlet conditions (see below), it can be
+represented exactly as a weighted sum of harmonically related complex
+exponentials:
+
+        x(t) = Sum from k = -infinity to infinity of
+               a_k * exp(j*k*omega_0*t)
+
+where a_k are the FOURIER SERIES COEFFICIENTS and k indexes the k-th
+HARMONIC (k=0 is the DC term, k=+/-1 is the fundamental, k=+/-2 is the
+second harmonic, and so on).
+
+ANALYSIS EQUATION (Recovering coefficients from x(t)):
+The coefficients are extracted by integrating over any single period:
+
+        a_k = (1/T) * Integral over one period T of
+              x(t) * exp(-j*k*omega_0*t) dt
+
+DIRICHLET CONDITIONS (sufficient conditions for CTFS convergence):
+A periodic signal x(t) has a valid CTFS representation if, over one
+period, ALL of the following hold:
+   (1) x(t) is absolutely integrable: Integral over one period of
+       |x(t)| dt < infinity.
+   (2) x(t) has a FINITE number of maxima and minima within any single
+       period (bounded variation).
+   (3) x(t) has a FINITE number of discontinuities within any single
+       period, and each such discontinuity is finite (a finite jump).
+At a jump discontinuity, the CTFS synthesis sum converges to the
+AVERAGE of the left-hand and right-hand limits of x(t) at that point
+(this is the same GIBBS PHENOMENON behavior seen when truncating the
+series to a finite number of harmonics: a fixed-height overshoot
+persists near discontinuities regardless of how many harmonics are
+included, though the overshoot narrows toward the discontinuity as
+more terms are added).
+
+RELATION TO POWER (PARSEVAL'S THEOREM FOR CTFS):
+Since periodic signals are power signals (see
+signals_and_systems_basics.txt, Section 3), the average power of x(t)
+over one period equals the sum of the powers contained in each
+harmonic:
+
+        P_infinity = (1/T) * Integral over one period of |x(t)|^2 dt
+                   = Sum from k = -infinity to infinity of |a_k|^2
+
+This states that total average power is conserved between the time
+domain and the (discrete) frequency domain of harmonic coefficients.
+
+-----------------------------------------------
+SECTION 2: DISCRETE-TIME FOURIER SERIES (DTFS)
+-----------------------------------------------
+
+SETUP:
+The DTFS applies to PERIODIC discrete-time signals. Let x[n] be
+periodic with fundamental period N and fundamental angular frequency:
+
+        omega_0 = 2*pi / N
+
+CRITICAL DIFFERENCE FROM CTFS — FINITE NUMBER OF HARMONICS:
+Because exp(j*k*omega_0*n) is itself periodic IN k with period N (a
+direct consequence of the DT complex exponential periodicity condition
+discussed in signals_and_systems_basics.txt, Section 2), there are
+only N DISTINCT harmonics available in discrete time (k = 0, 1, ...,
+N-1, or any other set of N consecutive integers). This is the single
+most important structural difference between the CTFS (infinitely many
+distinct harmonics) and the DTFS (exactly N distinct harmonics).
+
+SYNTHESIS EQUATION:
+        x[n] = Sum over any N consecutive values of k of
+               a_k * exp(j*k*omega_0*n)
+             = (1/N)*Sum_{k=<N>} ... [see analysis equation below for
+               the coefficient definition; the synthesis sum itself
+               carries no 1/N factor]
+
+ANALYSIS EQUATION:
+        a_k = (1/N) * Sum over any N consecutive values of n of
+              x[n] * exp(-j*k*omega_0*n)
+
+Both the synthesis sum (over k) and the analysis sum (over n) need
+only run over N consecutive integers (commonly n = 0,...,N-1 and
+k = 0,...,N-1), since both x[n] and a_k are periodic sequences with
+period N:
+
+        a_{k+N} = a_k        for all integers k
+
+CONVERGENCE:
+Unlike the CTFS, the DTFS involves only a FINITE sum (N terms), so no
+Dirichlet-type convergence conditions are required — the DTFS exists
+for every periodic DT sequence, with exact (not merely mean-square or
+pointwise-average) equality between x[n] and its synthesis sum at
+every n, including at any "discontinuity" (DT sequences have no jump
+discontinuities in the CT sense, since they are only ever defined at
+integers).
+
+PARSEVAL'S THEOREM FOR DTFS:
+        P_infinity = (1/N) * Sum over one period N of |x[n]|^2
+                   = Sum over one period N of |a_k|^2
+
+-----------------------------------------------
+SECTION 3: CORE PROPERTIES OF THE FOURIER SERIES
+-----------------------------------------------
+
+Notation: x(t) <---FS,omega_0---> a_k denotes a CTFS pair with
+fundamental frequency omega_0; x[n] <---FS,N---> a_k denotes a DTFS
+pair with fundamental period N. Both x_1, x_2 (or a_k, b_k) are assumed
+to share the same fundamental period/frequency in each property below.
+
+--- 3.1 LINEARITY ---
+
+CTFS:    A*x_1(t) + B*x_2(t)  <--->  A*a_k + B*b_k
+
+DTFS:    A*x_1[n] + B*x_2[n]  <--->  A*a_k + B*b_k
+
+--- 3.2 TIME SHIFTING ---
+
+CTFS:    x(t - t_0)  <--->  a_k * exp(-j*k*omega_0*t_0)
+
+DTFS:    x[n - n_0]  <--->  a_k * exp(-j*k*omega_0*n_0)
+
+A time shift multiplies each harmonic coefficient by a phase factor
+that depends on the harmonic index k; the MAGNITUDE of each
+coefficient, |a_k|, is unaffected.
+
+--- 3.3 TIME REVERSAL ---
+
+CTFS:    x(-t)  <--->  a_{-k}
+
+DTFS:    x[-n]  <--->  a_{-k}
+
+--- 3.4 TIME SCALING (CTFS ONLY, changes the fundamental frequency) ---
+
+For a real scaling factor alpha > 0:
+        x(alpha*t)  <--->  a_k unchanged, BUT the fundamental frequency
+                            becomes alpha*omega_0 (equivalently the
+                            fundamental period becomes T/alpha).
+(There is no direct DTFS analog, since DT time-scaling by a
+non-integer factor is not generally well-defined, and integer-factor
+DT time scaling changes the sample set rather than simply rescaling a
+continuous axis.)
+
+--- 3.5 MULTIPLICATION (PERIODIC CONVOLUTION IN THE COEFFICIENT DOMAIN) ---
+
+CTFS:    x_1(t) * x_2(t) [pointwise product]  <--->
+              Sum from l = -infinity to infinity of a_l * b_{k-l}
+              (discrete convolution of the two coefficient sequences)
+
+DTFS:    x_1[n] * x_2[n] [pointwise product]  <--->
+              Sum over one period N of a_l * b_{k-l}
+              (PERIODIC/CIRCULAR convolution of the two length-N
+              coefficient sequences, since both a_k and b_k are
+              themselves periodic with period N)
+
+--- 3.6 CONJUGATION AND CONJUGATE SYMMETRY ---
+
+CTFS:    x*(t) [complex conjugate]  <--->  a_{-k}*
+
+DTFS:    x*[n]  <--->  a_{-k}*
+
+CONSEQUENCE FOR REAL SIGNALS: if x(t) (or x[n]) is REAL-VALUED, then
+        a_{-k} = a_k*
+(conjugate symmetry), which further implies |a_{-k}| = |a_k| (even
+magnitude spectrum) and angle(a_{-k}) = -angle(a_k) (odd phase
+spectrum).
+
+-----------------------------------------------
+SECTION 4: RELATIONSHIP BETWEEN FOURIER SERIES AND FOURIER TRANSFORM
+-----------------------------------------------
+
+A periodic signal does not, strictly speaking, possess an ordinary
+CTFT/DTFT (it is neither absolutely integrable/summable nor finite
+energy), but its CTFT/DTFT CAN be written in a generalized sense as a
+train of impulses, with each impulse weighted by (2*pi times) the
+corresponding Fourier series coefficient:
+
+CTFT of a periodic x(t) with CTFS coefficients a_k:
+        X(j*omega) = 2*pi * Sum from k = -infinity to infinity of
+                      a_k * delta(omega - k*omega_0)
+
+DTFT of a periodic x[n] with DTFS coefficients a_k (period N):
+        X(e^(j*omega)) = 2*pi * Sum from k = -infinity to infinity of
+                          a_k * delta(omega - k*omega_0 - 2*pi*l),
+                          summed additionally over all integers l to
+                          preserve the mandatory 2*pi periodicity of
+                          the DTFT (see fourier_analysis.txt, Section 2)
+
+This equivalence is why the CTFS/DTFS can be viewed as a special,
+line-spectrum case of the more general CTFT/DTFT framework, and it is
+the formal bridge that allows LTI frequency-response analysis
+(developed for aperiodic signals via the CTFT/DTFT) to be applied
+directly to periodic inputs as well.
+
+-----------------------------------------------
+SECTION 5: ESSENTIAL FOURIER SERIES PAIRS LOOKUP TABLE
+-----------------------------------------------
+
+--- 5.1 CONTINUOUS-TIME PAIRS (period T, fundamental freq omega_0 = 2*pi/T) ---
+
+(1) Complex Exponential at the Fundamental:
+        exp(j*omega_0*t)   <--->   a_1 = 1, all other a_k = 0
+
+(2) Cosine:
+        cos(omega_0*t)   <--->   a_1 = a_{-1} = 1/2, all other a_k = 0
+
+(3) Sine:
+        sin(omega_0*t)   <--->   a_1 = 1/(2*j) = -j/2,
+                                  a_{-1} = -1/(2*j) = j/2,
+                                  all other a_k = 0
+
+(4) Periodic Rectangular (Square) Pulse Train:
+    Defined over one period as x(t) = 1 for |t| < T_1, and x(t) = 0 for
+    T_1 < |t| <= T/2, then repeated with period T:
+
+        a_k = sin(k*omega_0*T_1) / (k*pi)     for k != 0
+        a_0 = 2*T_1 / T
+
+    (This is the CTFS analog of the sinc-shaped CTFT of a single
+    rectangular pulse; sampling that sinc envelope at integer multiples
+    of omega_0 yields the coefficients a_k, illustrating the general
+    principle that CTFS coefficients of a periodically-repeated pulse
+    are proportional to samples of the CTFT of one isolated pulse.)
+
+(5) Impulse Train (period T):
+        Sum over n of delta(t - n*T)   <--->   a_k = 1/T for all k
+
+--- 5.2 DISCRETE-TIME PAIRS (period N, fundamental freq omega_0 = 2*pi/N) ---
+
+(1) Complex Exponential at the Fundamental:
+        exp(j*omega_0*n)   <--->   a_1 = 1, a_k = 0 for all other k in
+                                    one period (k = 0,...,N-1)
+
+(2) Cosine (assuming N/period chosen so the harmonic falls on an
+    integer k = k_0):
+        cos(k_0*omega_0*n)   <--->   a_{k_0} = a_{-k_0} = 1/2
+                                      (with a_{-k_0} interpreted mod N,
+                                      i.e. a_{N-k_0} = 1/2), all other
+                                      a_k = 0
+
+(3) Discrete Impulse Train (period N):
+        Sum over r of delta[n - r*N]   <--->   a_k = 1/N for all k
+
+=====================================================================
+END OF FILE: fourier_series.txt
+=====================================================================

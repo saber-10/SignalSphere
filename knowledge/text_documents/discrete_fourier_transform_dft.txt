@@ -1,0 +1,225 @@
+=====================================================================
+FILE: discrete_fourier_transform_dft.txt
+TOPIC: The Discrete Fourier Transform (DFT) and the FFT
+=====================================================================
+
+-----------------------------------------------
+SECTION 1: MOTIVATION — FROM THE DTFT TO A FINITE, COMPUTABLE TRANSFORM
+-----------------------------------------------
+
+THE PROBLEM WITH THE DTFT FOR COMPUTATION:
+The DTFT X(e^(j*omega)), as defined in fourier_analysis.txt, is a
+function of the CONTINUOUS variable omega and, for an infinite-length
+sequence, requires summing infinitely many terms. Neither property is
+directly implementable on a digital computer: a computer can only
+store and operate on a FINITE number of samples of the frequency axis,
+and can only sum a FINITE number of terms.
+
+DEFINITION — THE DFT AS SAMPLES OF THE DTFT:
+For a FINITE-LENGTH sequence x[n] defined for n = 0, 1, ..., N-1 (zero
+elsewhere), the N-POINT DISCRETE FOURIER TRANSFORM (DFT) is defined as
+the DTFT of x[n] evaluated at exactly N equally spaced frequencies
+around the unit circle:
+
+        X[k] = X(e^(j*omega)) |_{omega = 2*pi*k/N}
+             = Sum from n = 0 to N-1 of x[n] * exp(-j*2*pi*k*n/N)
+                                            for k = 0, 1, ..., N-1
+
+This IS the DFT ANALYSIS EQUATION. The frequency spacing between
+adjacent DFT samples is 2*pi/N (in normalized DT angular frequency),
+so a LARGER N samples the underlying DTFT MORE FINELY (denser
+frequency resolution), though it does not, by itself, change the
+underlying continuous DTFT curve being sampled.
+
+DFT SYNTHESIS EQUATION (Inverse DFT, IDFT):
+        x[n] = (1/N) * Sum from k = 0 to N-1 of
+               X[k] * exp(j*2*pi*k*n/N)                for n = 0,...,N-1
+
+NOTATIONAL SHORTHAND — THE TWIDDLE FACTOR:
+Define W_N = exp(-j*2*pi/N) (the "N-th root of unity" twiddle factor).
+Then the DFT pair can be written compactly as:
+
+        X[k] = Sum_{n=0}^{N-1} x[n] * W_N^(n*k)
+        x[n] = (1/N) * Sum_{k=0}^{N-1} X[k] * W_N^(-n*k)
+
+-----------------------------------------------
+SECTION 2: THE DFT AS AN IMPLICITLY PERIODIC (CIRCULAR) TRANSFORM
+-----------------------------------------------
+
+CRITICAL PROPERTY — IMPLICIT PERIODICITY:
+Although the DFT is defined using only N samples of x[n] (n=0,...,N-1)
+and produces only N samples of X[k] (k=0,...,N-1), BOTH the analysis
+and synthesis equations are algebraically identical to evaluating a
+PERIODIC extension of x[n] (period N) and X[k] (period N), because
+exp(j*2*pi*k*n/N) is periodic in both k and n with period N. As a
+direct consequence:
+
+        X[k + N] = X[k]      for all integers k
+        x[n + N] = x[n]      for all integers n
+
+(when x[n] and X[k] are extended beyond their original defining
+ranges using the DFT formulas themselves). This is why DFT-based
+operations such as shifting and convolution are inherently CIRCULAR
+(modulo-N) rather than linear — see Section 4.
+
+RELATIONSHIP TO THE DTFS:
+The DFT is mathematically identical in form to the DTFS analysis/
+synthesis equations (see fourier_series.txt, Section 2), with the sign
+convention on the exponent and normalization differing only by which
+equation carries the 1/N factor. The key conceptual distinction is
+one of INTERPRETATION: the DTFS is used for signals that are
+GENUINELY, PHYSICALLY periodic, whereas the DFT is used as a
+computational TOOL applied to a FINITE-LENGTH (often aperiodic)
+sequence, with periodicity arising only as an artifact of the discrete
+sampling of its DTFT.
+
+-----------------------------------------------
+SECTION 3: CORE PROPERTIES OF THE DFT
+-----------------------------------------------
+
+All sequences below are assumed length N (or zero-padded to length N),
+and all shifts/index arithmetic are understood MODULO N (circular),
+per Section 2.
+
+--- 3.1 LINEARITY ---
+
+        a*x_1[n] + b*x_2[n]   <--->   a*X_1[k] + b*X_2[k]
+
+--- 3.2 CIRCULAR TIME SHIFT ---
+
+        x[(n - n_0) mod N]   <--->   X[k] * exp(-j*2*pi*k*n_0/N)
+
+Only the PHASE of X[k] is affected; |X[k]| is unchanged. This is the
+circular (finite-length) analog of the DTFT time-shift property.
+
+--- 3.3 CIRCULAR CONVOLUTION (THE DFT'S CONVOLUTION PROPERTY) ---
+
+Define the N-POINT CIRCULAR CONVOLUTION of two length-N sequences as:
+
+        x_1[n] (circleX) x_2[n] = Sum_{m=0}^{N-1}
+                                   x_1[m] * x_2[(n - m) mod N]
+
+Then:
+        x_1[n] (circleX) x_2[n]   <--->   X_1[k] * X_2[k]
+
+This is the DFT analog of the ordinary (linear) convolution property
+of the DTFT/CTFT (fourier_analysis.txt, Section 3.6): multiplication
+of DFTs corresponds to CIRCULAR, not linear, convolution of the
+time-domain sequences.
+
+--- 3.4 RELATIONSHIP BETWEEN CIRCULAR AND LINEAR CONVOLUTION ---
+
+If x_1[n] has length L_1 and x_2[n] has length L_2, their ORDINARY
+(linear) convolution has length L_1 + L_2 - 1 (see
+convolution_and_impulse_response.txt, Section 2.5). The N-point
+circular convolution of x_1 and x_2 EQUALS their linear convolution
+if and only if both sequences are ZERO-PADDED to a common length:
+
+        N >= L_1 + L_2 - 1
+
+If this condition is not met, the circular convolution result is the
+linear convolution result with "wrap-around" TIME-ALIASING: samples
+that would have fallen at indices >= N wrap around and add into the
+low-index samples of the result.
+
+--- 3.5 MULTIPLICATION IN TIME (DUAL OF 3.3) ---
+
+        x_1[n] * x_2[n] [pointwise product]   <--->
+              (1/N) * [X_1[k] (circleX) X_2[k]]
+              (circular convolution in the DFT domain)
+
+--- 3.6 CONJUGATE SYMMETRY (REAL-VALUED SEQUENCES) ---
+
+If x[n] is real-valued, then:
+
+        X[(N - k) mod N] = X[k]*
+
+so |X[k]| is even (with respect to the circular index) and angle(X[k])
+is odd. Consequently, for a real length-N sequence, only the DFT bins
+k = 0, 1, ..., floor(N/2) contain independent information; the
+remaining bins are determined by conjugate symmetry. This is the
+computational basis for "real FFT" routines that avoid computing (or
+storing) redundant bins.
+
+--- 3.7 PARSEVAL'S RELATION FOR THE DFT ---
+
+        Sum_{n=0}^{N-1} |x[n]|^2  =  (1/N) * Sum_{k=0}^{N-1} |X[k]|^2
+
+-----------------------------------------------
+SECTION 4: ZERO-PADDING AND FREQUENCY RESOLUTION
+-----------------------------------------------
+
+EFFECT OF ZERO-PADDING:
+Appending zeros to a finite-length sequence before computing the DFT
+(increasing N without adding any new signal information) does NOT
+change the underlying continuous DTFT of the (still finite-support)
+sequence; it only causes the DFT to sample that SAME underlying DTFT
+curve MORE DENSELY (more, closer-spaced frequency samples). This is
+often called "interpolating" the spectrum, though it is important to
+note zero-padding provides no new spectral RESOLUTION in the sense of
+distinguishing two closely spaced true sinusoidal components — it only
+produces a smoother-looking, more finely sampled picture of the
+resolution the original (unpadded) data actually supports.
+
+TRUE FREQUENCY RESOLUTION:
+Genuine frequency resolution (the ability to distinguish two closely
+spaced sinusoids) is fundamentally limited by the ORIGINAL signal
+duration/length (equivalently, the width of the DTFT's main-lobe for
+a finite observation window), not by the DFT length N chosen for
+computing it. For a length-L observation window, the DTFT main-lobe
+width (and hence the practical frequency resolution) is on the order
+of 2*pi/L radians/sample.
+
+-----------------------------------------------
+SECTION 5: THE FAST FOURIER TRANSFORM (FFT)
+-----------------------------------------------
+
+MOTIVATION — COMPUTATIONAL COST:
+Computed directly from its definition, an N-point DFT requires, for
+each of the N output values X[k], a sum of N complex multiply-add
+terms, giving a total computational cost that grows as O(N^2) complex
+multiplications.
+
+THE FFT AS A FAST ALGORITHM (NOT A DIFFERENT TRANSFORM):
+The FAST FOURIER TRANSFORM (FFT) is not a different transform from the
+DFT — it produces EXACTLY the same numerical output X[k] as the direct
+DFT summation — but is instead a family of algorithms that compute
+that same output far more efficiently, with computational cost
+O(N*log2(N)) instead of O(N^2), by recursively exploiting the
+symmetry and periodicity properties of the twiddle factors W_N^(nk).
+
+RADIX-2 DECIMATION-IN-TIME (DIT) FFT — CORE IDEA:
+For N a power of 2, the N-point DFT sum is split into two (N/2)-point
+DFT sums, one over the EVEN-indexed input samples and one over the
+ODD-indexed input samples:
+
+        X[k] = Sum_{n even} x[n]*W_N^(nk) + Sum_{n odd} x[n]*W_N^(nk)
+             = E[k] + W_N^k * O[k]
+
+where E[k] and O[k] are themselves (N/2)-point DFTs of the even- and
+odd-indexed subsequences (each periodic in k with period N/2), and
+W_N^k is the twiddle factor for stage combination. Because E[k] and
+O[k] each have period N/2 in k, the two (N/2)-point DFTs, once
+computed, can be reused (via this "butterfly" combination) to
+construct all N values of X[k], not just N/2 of them:
+
+        X[k]       = E[k] + W_N^k * O[k]          for k = 0,...,N/2-1
+        X[k + N/2] = E[k] - W_N^k * O[k]          for k = 0,...,N/2-1
+
+RECURSIVE COMPLEXITY ARGUMENT:
+Applying this even/odd splitting RECURSIVELY (splitting each (N/2)-
+point DFT into two (N/4)-point DFTs, and so on, down to trivial
+1-point DFTs) produces log2(N) stages, each stage requiring O(N)
+butterfly operations, for the stated overall O(N*log2(N)) complexity.
+
+PRACTICAL IMPLICATION: because the FFT computes circular convolution
+(via Section 3.3-3.4) far more cheaply than direct time-domain
+convolution for large sequence lengths, "FAST CONVOLUTION" methods
+(e.g., the OVERLAP-ADD and OVERLAP-SAVE block-convolution techniques)
+use zero-padded FFTs together with the linear/circular equivalence
+condition of Section 3.4 to compute LINEAR convolutions of long
+sequences efficiently.
+
+=====================================================================
+END OF FILE: discrete_fourier_transform_dft.txt
+=====================================================================

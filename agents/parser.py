@@ -43,6 +43,48 @@ TOPIC_KEYWORDS = {
         "signal",
         "continuous time",
         "discrete time",
+    ],
+
+    "state_space": [
+        "state space",
+        "state-space",
+        "state variable",
+        "state vector",
+        "system matrix",
+        "matrix exponential",
+        "controllability",
+        "observability",
+        "similarity transformation",
+    ],
+
+    "convolution": [
+        "convolution",
+        "impulse response",
+        "impulse",
+        "cascade",
+        "parallel",
+        "feedback",
+        "integrator",
+        "accumulator",
+    ],
+
+    "fourier_series": [
+        "fourier series",
+        "ctfs",
+        "dtfs",
+        "harmonics",
+        "dirichlet",
+        "parseval",
+    ],
+
+    "dft": [
+        "dft",
+        "fft",
+        "fast fourier transform",
+        "twiddle",
+        "zero padding",
+        "frequency resolution",
+        "circular convolution",
     ]
 }
 
@@ -109,9 +151,9 @@ def detect_problem_type(question: str) -> Tuple[ProblemType, float]:
         ProblemType.APPLICATION: 0,
     }
 
-    words = question.split()
+    question = question.lower()
 
-    for word in words:
+    for word in COMPARISON_KEYWORDS:
 
         if word in CONCEPT_KEYWORDS:
             scores[ProblemType.CONCEPT] += 1
